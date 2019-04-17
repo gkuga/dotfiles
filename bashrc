@@ -58,3 +58,14 @@ alias l='ls -CF'                              #
 
 # k8s
 alias k='kubectl'
+
+# peco
+function ghql() {
+  local selected_file=$(ghq list --full-path | peco)
+  if [ -n "$selected_file" ]; then
+    cd ${selected_file}
+    pwd
+  fi
+}
+bind -x '"\201": ghql'
+bind '"\C-g":"\201 \C-j"'

@@ -12,3 +12,5 @@
 [user]
 	email = isuya.kuga@gmail.com
 	name  = Gaku Yasui
+[ghq]
+	root = /home/vagrant/dev/src
