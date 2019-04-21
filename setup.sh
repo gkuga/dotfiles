@@ -7,7 +7,7 @@ do
   ln -fs $HOME/dotfiles/$file $HOME/.$file
 done
 
-SCRIPTS=(git-completion.sh)
+SCRIPTS=(git-completion.sh hub.bash_completion.sh)
 SCRIPTS_HOME=$HOME/.bash.d/
 
 mkdir -p $SCRIPTS_HOME
