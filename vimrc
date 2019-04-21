@@ -30,3 +30,7 @@ inoremap <C-h> <Left>
 inoremap <C-l> <Right>
 inoremap <silent> <C-h> <C-g>u<C-h>
 inoremap <silent> <C-d> <Del>
+
+" Coloer
+set background=dark
+hi Search cterm=bold ctermfg=2 ctermbg=0
