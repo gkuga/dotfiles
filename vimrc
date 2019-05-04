@@ -20,8 +20,6 @@ set number
 set hidden
 set tags+=tags;
 
-syntax on
-
 inoremap <silent> ,, <ESC>
 
 inoremap <C-j> <Down>
@@ -31,6 +29,17 @@ inoremap <C-l> <Right>
 inoremap <silent> <C-h> <C-g>u<C-h>
 inoremap <silent> <C-d> <Del>
 
+call plug#begin('~/.vim/plugged')
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'hashivim/vim-terraform'
+call plug#end()
+
 " Coloer
+syntax on
+colorscheme desert
 set background=dark
 hi Search cterm=bold ctermfg=2 ctermbg=0
+
+" vim-terraform
+let g:terraform_fmt_on_save=1
+ 
