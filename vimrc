@@ -32,6 +32,7 @@ inoremap <silent> <C-d> <Del>
 call plug#begin('~/.vim/plugged')
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'hashivim/vim-terraform'
+Plug 'rust-lang/rust.vim'
 call plug#end()
 
 " Coloer

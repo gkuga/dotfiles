@@ -56,6 +56,9 @@ alias ll='ls -l'                              # long list
 alias la='ls -A'                              # all but . and ..
 alias l='ls -CF'                              #
 
+# vim
+alias vim='nvim'
+
 # k8s
 alias k='kubectl'
 

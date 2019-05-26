@@ -8,7 +8,7 @@
 [color]
   ui = true
 [core]
-  editor = vi -c \"set fenc=utf-8\"
+  editor = nvim -c \"set fenc=utf-8\"
 [user]
 	email = isuya.kuga@gmail.com
 	name  = Gaku Yasui
