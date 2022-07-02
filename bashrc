@@ -56,17 +56,15 @@ alias ll='ls -l'                              # long list
 alias la='ls -A'                              # all but . and ..
 alias l='ls -CF'                              #
 
-# vim
-alias vim='nvim'
-
 # k8s
 alias k='kubectl'
 
 # peco
 function ghql() {
-  local selected_file=$(ghq list --full-path | peco)
+  local git_base_path=`echo $HOME/dev/src/github.com`
+  local selected_file=$(ghq list --full-path | sed -e "s|${git_base_path}/||" | peco)
   if [ -n "$selected_file" ]; then
-    cd ${selected_file}
+    cd ${git_base_path}/${selected_file}
     pwd
   fi
 }
