@@ -1,24 +1,18 @@
-set nocompatible
+set paste
+set number
+set hidden
 set title
 set ruler
+set backspace=indent,eol,start
 set autoindent
 set smartindent
 set expandtab
-set backspace=indent,eol,start
-
+retab 2
 set tabstop=2
 set shiftwidth=2
 set shiftround
 set matchpairs+=<:>
 set fileencoding=utf-8
-
-set expandtab
-retab 2
-
-set paste
-set number
-set hidden
-set tags+=tags;
 
 inoremap <silent> ,, <ESC>
 
@@ -29,18 +23,14 @@ inoremap <C-l> <Right>
 inoremap <silent> <C-h> <C-g>u<C-h>
 inoremap <silent> <C-d> <Del>
 
-call plug#begin('~/.vim/plugged')
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'hashivim/vim-terraform'
-Plug 'rust-lang/rust.vim'
+call plug#begin()
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'mattn/vim-sonictemplate'
 call plug#end()
 
-" Coloer
-syntax on
-colorscheme desert
-set background=dark
-hi Search cterm=bold ctermfg=2 ctermbg=0
-
-" vim-terraform
-let g:terraform_fmt_on_save=1
- 
+let g:lsp_diagnostics_echo_cursor = 1
+autocmd BufWritePre <buffer> LspDocumentFormatSync
+autocmd BufWritePre *.py call execute('LspDocumentFormatSync --server=python-lsp-server')
