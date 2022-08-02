@@ -8,9 +8,16 @@
 [color]
   ui = true
 [core]
-  editor = nvim -c \"set fenc=utf-8\"
+  editor = vim -c \"set fenc=utf-8\"
 [user]
-	email = isuya.kuga@gmail.com
+	email = gaku.yasui@gmail.com
 	name  = Gaku Yasui
 [ghq]
-	root = /home/vagrant/dev/src
+	root = /home/opc/dev/src
+[init]
+	defaultBranch = main
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f

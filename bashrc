@@ -2,13 +2,6 @@
 # for screen command in this script
 [[ "$-" != *i* ]] && return
 
-if [ -d "${HOME}/.bash.d" ] ; then
-  for script in "${HOME}"/.bash.d/*.sh ; do
-    [ -O "$script" ] && . "$script" && echo load "$script"
-  done
-  unset script
-fi
-
 # prompt settings
 function parse_git_branch {
     git branch --no-color 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ [\1]/'
@@ -23,19 +16,7 @@ function prompt {
 
 prompt
 
-# prompt for screen
-
-if [ $TERM == 'screen' ]; then
-  PS1=${PS1}'\[\ek\W\e\\\]'
-fi
-
 # User specific aliases and functions
-
-# screen
-# if [ -z "$STY" ] && then screen -xRS yasui
-screen -xRS yasui
-
-# Aliases
 
 # Default to human readable figures
 alias df='df -h'

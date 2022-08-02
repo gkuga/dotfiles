@@ -35,6 +35,4 @@ let g:lsp_diagnostics_echo_cursor = 1
 autocmd BufWritePre <buffer> LspDocumentFormatSync
 autocmd BufWritePre *.py call execute('LspDocumentFormatSync --server=python-lsp-server')
 
-let g:lsp_settings = {
-\ 'typescript-language-server': { 'cmd': [&shell, &shellcmdflag, 'typescript-language-server --stdio']}
-\}
+nnoremap <silent> <Space>f : LspDocumentFormatSync<CR>
