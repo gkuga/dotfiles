@@ -10,14 +10,14 @@
 [core]
   editor = vim -c \"set fenc=utf-8\"
 [user]
-	email = gaku.yasui@gmail.com
-	name  = Gaku Yasui
+  email = gaku.yasui@gmail.com
+  name  = Gaku Yasui
 [ghq]
-	root = /home/opc/dev/src
+  root = /home/gkuga/dev/src
 [init]
-	defaultBranch = main
+  defaultBranch = main
 [filter "lfs"]
-	process = git-lfs filter-process
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
