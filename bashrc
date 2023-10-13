@@ -2,6 +2,13 @@
 # for screen command in this script
 [[ "$-" != *i* ]] && return
 
+if [ -d "${HOME}/.bash.d" ] ; then
+  for script in "${HOME}"/.bash.d/*.sh ; do
+    [ -O "$script" ] && . "$script" && echo load "$script"
+  done
+  unset script
+fi
+
 # prompt settings
 function parse_git_branch {
     git branch --no-color 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ [\1]/'
