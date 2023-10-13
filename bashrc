@@ -49,5 +49,16 @@ function ghql() {
     pwd
   fi
 }
-bind -x '"\201": ghql'
-bind '"\C-g":"\201 \C-j"'
+
+bind '"\C-g":"ghql \C-j"'
+
+# AWS
+function aws-configure() {
+  local selected_profile=$(aws configure list-profiles | peco)
+  if [ -n "$selected_profile" ]; then
+    export AWS_PROFILE=$selected_profile
+  fi
+}
+# bind -x '"\202": aws-configure'
+# bind '"\C-l\C-a":"\202 \C-j"'
+bind '"\C-l\C-a":"aws-configure \C-j"'
