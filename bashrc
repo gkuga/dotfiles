@@ -88,4 +88,12 @@ function aws-configure() {
 }
 # bind -x '"\202": aws-configure'
 # bind '"\C-l\C-a":"\202 \C-j"'
-bind '"\C-l\C-a":"aws-configure \C-j"'
+bind '"\C-laws":"aws-configure \C-j"'
+
+# Usacloud
+function usacloud-configure() {
+  local selected_profile=$(usacloud config list | grep -v '* ' | peco)
+  #usacloud config use $selected_profile
+  echo $selected_profile
+}
+bind '"\C-lusa":"usacloud-configure \C-j"'
