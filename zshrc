@@ -1,3 +1,10 @@
+if [ -d "${HOME}/.profile.d" ] ; then
+  for script in "${HOME}"/.profile.d/*.sh ; do
+    [ -O "$script" ] && . "$script" && echo load "$script"
+  done
+  unset script
+fi
+
 if [ -d "${HOME}/.zsh.d" ] ; then
   for script in "${HOME}"/.zsh.d/*.sh ; do
     [ -O "$script" ] && . "$script" && echo load "$script"
@@ -16,9 +23,10 @@ zstyle ':vcs_info:git:*' formats '%b'
 
 # peco
 function ghql() {
-  local selected_file=$(ghq list --full-path | peco)
+  local git_base_path=`echo $HOME/dev/src/github.com`
+  local selected_file=$(ghq list --full-path | sed -e "s|${git_base_path}/||" | peco)
   if [ -n "$selected_file" ]; then
-    cd ${selected_file}
+    cd ${git_base_path}/${selected_file}
     pwd
     zle reset-prompt
   fi
