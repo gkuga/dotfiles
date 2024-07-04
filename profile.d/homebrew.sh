@@ -1,7 +1,6 @@
 #!/bin/sh
 
 script_name=$(basename "$0")
-echo $script_name
 
 if [ "$(uname)" = "Darwin" ] && [ "$(uname -m)" = "arm64" ]; then
   export PATH="/opt/homebrew/bin:$PATH"
