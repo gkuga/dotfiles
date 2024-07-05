@@ -1,9 +1,16 @@
 if type brew &>/dev/null; then
-  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-  FPATH=$(brew --prefix)/share/zsh/site-functions:${FPATH}
-
+  fpath=(
+    $(brew --prefix)/share/zsh-completions:$FPATH
+    $(brew --prefix)/share/zsh/site-functions
+    ~/.zsh_completions
+    $fpath
+  )
   autoload -Uz compinit
   compinit
+  zstyle ':completion:*' verbose yes
+  zstyle ':completion:*' format '%B%d%b'
+  zstyle ':completion:*:warnings' format 'No matches for: %d'
+  zstyle ':completion:*' group-name ''
 fi
 
 # You may also need to force rebuild `zcompdump`:
