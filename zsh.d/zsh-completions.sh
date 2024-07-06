@@ -5,8 +5,7 @@ if type brew &>/dev/null; then
     ~/.zsh_completions
     $fpath
   )
-  autoload -Uz compinit
-  compinit
+  autoload -Uz compinit && compinit
   zstyle ':completion:*' verbose yes
   zstyle ':completion:*' format '%B%d%b'
   zstyle ':completion:*:warnings' format 'No matches for: %d'
