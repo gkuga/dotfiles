@@ -2,11 +2,11 @@
 
 local -a commands
 commands=(
-	$(make -p | awk -F: '
+	$(make -qp | awk -F: '
 		BEGIN { not_a_target = 0 }
 		/^# Not a target:/ { not_a_target = 1; next }
 		not_a_target { not_a_target = 0; next }
-		/^[a-zA-Z0-9_][^\$#\/=[:space:]]*:/ { print $1}
+		/^[a-zA-Z0-9_][^\$#\/=[:space:]]*:/ { print $1 }
 	'| sort -u)
 )
 
