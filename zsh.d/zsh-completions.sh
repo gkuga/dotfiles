@@ -1,11 +1,13 @@
 if type brew &>/dev/null; then
   fpath=(
+    ~/.zsh_completions
     $(brew --prefix)/share/zsh-completions:$FPATH
     $(brew --prefix)/share/zsh/site-functions
-    ~/.zsh_completions
     $fpath
   )
   autoload -Uz compinit && compinit
+  compdef -d make
+  compdef _make_override make
   zstyle ':completion:*' verbose yes
   zstyle ':completion:*' format '%B%d%b'
   zstyle ':completion:*:warnings' format 'No matches for: %d'

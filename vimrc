@@ -51,15 +51,15 @@ nnoremap <leader>df :LspDocumentFormat<cr>
 nnoremap <leader>dd :LspDefinition<cr>
 
 let g:lsp_settings = {
-\   'pylsp-all': {
-\     'workspace_config': {
-\       'pylsp': {
-\         'plugins': {
-\           'pycodestyle': {
-\             'ignore': ["E221", "E501"]
-\           }
+\ 'pylsp-all': {
+\   'workspace_config': {
+\     'pylsp': {
+\       'plugins': {
+\         'pycodestyle': {
+\           'ignore': ["E221", "E501"]
 \         }
 \       }
 \     }
-\   },
+\   }
+\ },
 \}
