@@ -61,5 +61,15 @@ let g:lsp_settings = {
 \       }
 \     }
 \   }
-\ },
+\ }
 \}
+
+"" There is an issue where TypeScript becomes necessary when using JavaScript.
+let g:lsp_settings['typescript-language-server'] = {
+\  'blocklist': []
+\}
+
+let g:lsp_settings_filetype_vue = ['typescript-language-server', 'volar-server']
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('~/vim-lsp.log')
+let g:asyncomplete_log_file = expand('~/asyncomplete.log')

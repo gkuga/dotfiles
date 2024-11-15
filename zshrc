@@ -28,3 +28,4 @@ export LSCOLORS=Gxfxcxdxbxegedabagacad
 alias ls="ls -G"
 alias ll="ls -lG"
 alias la="ls -laG"
+export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
