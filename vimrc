@@ -16,7 +16,6 @@ set shiftround
 set matchpairs+=<:>
 set fileencoding=utf-8
 
-
 inoremap <silent> ,, <ESC>
 
 inoremap <C-j> <Down>
@@ -32,6 +31,8 @@ Plug 'mattn/vim-lsp-settings'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'mattn/vim-sonictemplate'
+Plug 'github/copilot.vim'
+Plug 'DanBradbury/copilot-chat.vim'
 call plug#end()
 
 " lsp
@@ -73,3 +74,7 @@ let g:lsp_settings_filetype_vue = ['typescript-language-server', 'volar-server']
 let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('~/vim-lsp.log')
 let g:asyncomplete_log_file = expand('~/asyncomplete.log')
+
+set pastetoggle=<F2>
+
+filetype plugin indent on
