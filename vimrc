@@ -1,6 +1,5 @@
 let mapleader = "\<space>"
 
-set paste
 set number
 set hidden
 set title
@@ -78,3 +77,8 @@ let g:asyncomplete_log_file = expand('~/asyncomplete.log')
 set pastetoggle=<F2>
 
 filetype plugin indent on
+
+""
+imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
+imap <C-L> <Plug>(copilot-accept-word)
+let g:copilot_no_tab_map = v:true
