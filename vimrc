@@ -15,7 +15,7 @@ set shiftround
 set matchpairs+=<:>
 set fileencoding=utf-8
 
-inoremap <silent> ,, <ESC>
+" inoremap <silent> ,, <ESC>
 
 inoremap <C-j> <Down>
 inoremap <C-k> <Up>
@@ -38,17 +38,17 @@ call plug#end()
 let g:lsp_diagnostics_echo_cursor = 1
 autocmd BufWritePre <buffer> LspDocumentFormatSync
 autocmd BufWritePre *.py call execute('LspDocumentFormatSync --server=python-lsp-server')
-nnoremap <leader>dd :LspDefinition<cr>
-nnoremap <leader>dn :LspNextDiagnostic<cr>
-nnoremap <leader>dp :LspPreviousDiagnostic<cr>
-nnoremap <leader>df :LspReferences<cr>
-nnoremap <leader>dr :LspRename<cr>
-nnoremap <leader>ds :LspStopServer<cr>
-nnoremap <leader>dp :LspPeekDefinition<cr>
-nnoremap <leader>da :LspCodeAction<cr>
-nnoremap <leader>dh :LspHover<cr>
-nnoremap <leader>df :LspDocumentFormat<cr>
-nnoremap <leader>dd :LspDefinition<cr>
+nnoremap <leader>dd  :LspDefinition<cr>
+nnoremap <leader>dn  :LspNextDiagnostic<cr>
+nnoremap <leader>dpr :LspPreviousDiagnostic<cr>
+nnoremap <leader>df  :LspReferences<cr>
+nnoremap <leader>dr  :LspRename<cr>
+nnoremap <leader>ds  :LspStopServer<cr>
+nnoremap <leader>dpe :LspPeekDefinition<cr>
+nnoremap <leader>da  :LspCodeAction<cr>
+nnoremap <leader>dh  :LspHover<cr>
+nnoremap <leader>df  :LspDocumentFormat<cr>
+nnoremap <leader>dd  :LspDefinition<cr>
 
 let g:lsp_settings = {
 \ 'pylsp-all': {
@@ -64,11 +64,6 @@ let g:lsp_settings = {
 \ }
 \}
 
-"" There is an issue where TypeScript becomes necessary when using JavaScript.
-let g:lsp_settings['typescript-language-server'] = {
-\  'blocklist': []
-\}
-
 let g:lsp_settings_filetype_vue = ['typescript-language-server', 'volar-server']
 let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('~/vim-lsp.log')
@@ -79,6 +74,8 @@ set pastetoggle=<F2>
 filetype plugin indent on
 
 ""
+nnoremap <leader>cc :CopilotChatOpen<CR>
 imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
 imap <C-L> <Plug>(copilot-accept-word)
+vmap <leader>a <Plug>CopilotChatAddSelection
 let g:copilot_no_tab_map = v:true
