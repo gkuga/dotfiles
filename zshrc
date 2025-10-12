@@ -39,3 +39,10 @@ export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
 export GPG_TTY=$(tty)
 
 export PATH=/Users/gkuga/.tiup/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# AsyncAPI CLI Autocomplete
+
+ASYNCAPI_AC_ZSH_SETUP_PATH=/Users/gkuga/Library/Caches/@asyncapi/cli/autocomplete/zsh_setup && test -f $ASYNCAPI_AC_ZSH_SETUP_PATH && source $ASYNCAPI_AC_ZSH_SETUP_PATH; # asyncapi autocomplete setup
+
+
