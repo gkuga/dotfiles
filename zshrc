@@ -46,3 +46,9 @@ export PATH="$HOME/.local/bin:$PATH"
 ASYNCAPI_AC_ZSH_SETUP_PATH=/Users/gkuga/Library/Caches/@asyncapi/cli/autocomplete/zsh_setup && test -f $ASYNCAPI_AC_ZSH_SETUP_PATH && source $ASYNCAPI_AC_ZSH_SETUP_PATH; # asyncapi autocomplete setup
 
 
+
+# Added by Antigravity
+export PATH="/Users/gkuga/.antigravity/antigravity/bin:$PATH"
+
+# Added by Cargo
+export PATH="/Users/gkuga/.cargo/bin:$PATH"
