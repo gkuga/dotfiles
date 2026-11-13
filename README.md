@@ -52,6 +52,22 @@ Kept out of this public repository on purpose:
 - `~/.gitconfig.local`: work `url.insteadOf`, credential helpers, ...
 - `~/.bashrc.local`: anything else for one machine
 
+## AI in Neovim
+
+Once per machine: `claude` (log in to Claude Code) and `:Copilot auth` in Neovim.
+
+| Key | Mode | Action |
+|---|---|---|
+| `<Tab>` | insert | accept the Copilot suggestion (otherwise snippet jump / tab) |
+| `<M-w>` / `<M-]>` / `<M-[>` / `<C-]>` | insert | accept a word / next / previous / dismiss |
+| `<leader>ac` | normal | toggle the Claude Code terminal |
+| `<leader>as` | visual | send the selection to Claude |
+| `<leader>ab` | normal | add the current buffer to Claude's context |
+| `<leader>aa` / `<leader>ad` | normal | accept / deny Claude's proposed diff |
+| `<C-q>` / `<C-h/j/k/l>` | Claude terminal | leave terminal mode / move to another window |
+
+`<M-...>` keys need "Use Option as Meta" in the macOS terminal settings.
+
 ## Day-to-day
 
 ```sh
