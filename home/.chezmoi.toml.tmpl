@@ -8,6 +8,10 @@
 {{- if eq .chezmoi.os "linux" -}}
 {{-   $wsl = .chezmoi.kernel.osrelease | lower | contains "microsoft" -}}
 {{- end -}}
+# The repository root (it holds .chezmoiroot), so that plain `chezmoi diff`
+# and `chezmoi apply` work without --source.
+sourceDir = {{ .chezmoi.workingTree | quote }}
+
 [data]
   name = {{ $name | quote }}
   email = {{ $email | quote }}

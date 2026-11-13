@@ -13,7 +13,7 @@ if ! has chezmoi; then
   else
     log "installing chezmoi into $BIN_DIR"
     run mkdir -p "$BIN_DIR"
-    run sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$BIN_DIR"
+    run_installer sh https://get.chezmoi.io -b "$BIN_DIR"
   fi
 fi
 
@@ -33,9 +33,11 @@ if [ "${DRY_RUN:-0}" = 1 ]; then
 fi
 
 # Show what is going to change before touching existing files.
-chezmoi init --source "$REPO_DIR"
-if [ -n "$(chezmoi diff)" ]; then
-  chezmoi diff
+cz() { chezmoi --source "$REPO_DIR" "$@"; }
+cz init
+changes="$(cz diff --no-pager)"
+if [ -n "$changes" ]; then
+  printf '%s\n' "$changes"
   confirm "apply these dotfile changes?" || die "aborted; nothing was applied"
 fi
-chezmoi apply
+cz apply
