@@ -21,7 +21,7 @@ packages_darwin() {
   fi
   if ! has brew; then
     log "installing Homebrew"
-    run /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    run_installer /bin/bash https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
     if [ "${DRY_RUN:-0}" = 1 ]; then
       log "would run: brew bundle --file=$PKG_DIR/Brewfile"
       return

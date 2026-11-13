@@ -18,6 +18,20 @@ run() {
 
 has() { command -v "$1" >/dev/null 2>&1; }
 
+# Downloads an installer script and runs it: run_installer SHELL URL [ARGS...]
+# The whole script is fetched before it runs, so a broken download never runs
+# half a script. In a dry run nothing is downloaded.
+run_installer() {
+  local shell="$1" url="$2" script
+  shift 2
+  if [ "${DRY_RUN:-0}" = 1 ]; then
+    printf '\033[2m[dry-run]\033[0m %s -c "$(curl -fsSL %s)" -- %s\n' "$shell" "$url" "$*" >&2
+    return 0
+  fi
+  script="$(curl -fsSL "$url")" || die "failed to download $url"
+  "$shell" -c "$script" -- "$@"
+}
+
 # Prints one of: darwin, wsl, linux.
 detect_platform() {
   case "$(uname -s)" in

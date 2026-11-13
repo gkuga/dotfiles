@@ -12,7 +12,7 @@ if ! has mise; then
     run brew install mise
   else
     log "installing mise into ~/.local/bin"
-    run sh -c "$(curl -fsSL https://mise.run)"
+    run_installer sh https://mise.run
   fi
 fi
 
