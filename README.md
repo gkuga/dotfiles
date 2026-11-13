@@ -37,6 +37,13 @@ Steps run in this order; each one is idempotent:
 
 On the first `chezmoi init` you are asked for git name/email and GPG signing
 settings. Answers are stored in `~/.config/chezmoi/chezmoi.toml` only.
+Without a terminal, pass them up front:
+
+```sh
+chezmoi init --source . \
+  --promptString 'Git user.name=Your Name,Git user.email=you@example.com' \
+  --promptBool 'Sign git commits with GPG=false'
+```
 
 ## Machine-specific settings
 

@@ -3,7 +3,11 @@
 {{- $name := promptStringOnce . "name" "Git user.name" "Gaku Yasui" -}}
 {{- $email := promptStringOnce . "email" "Git user.email" -}}
 {{- $gpgsign := promptBoolOnce . "gpgsign" "Sign git commits with GPG" true -}}
-{{- $signingkey := promptStringOnce . "signingkey" "GPG signing key ID (empty = gpg default key)" "" -}}
+{{- /* No "=" or "," in prompts: `chezmoi init --promptString PROMPT=VALUE` could not set them. */ -}}
+{{- $signingkey := "" -}}
+{{- if $gpgsign -}}
+{{-   $signingkey = promptStringOnce . "signingkey" "GPG signing key ID (leave empty for the default key)" "" -}}
+{{- end -}}
 {{- $wsl := false -}}
 {{- if eq .chezmoi.os "linux" -}}
 {{-   $wsl = .chezmoi.kernel.osrelease | lower | contains "microsoft" -}}
