@@ -1,9 +1,11 @@
-# macOS packages. Language runtimes and neovim come from mise
-# (~/.config/mise/config.toml), not from Homebrew.
+# macOS packages for every Mac (install.sh runs `brew bundle` on this file).
+# Language runtimes and neovim come from mise (~/.config/mise/config.toml),
+# not from Homebrew. Hardware/embedded tools and build dependencies that only
+# some Macs need are in Brewfile.extra.
 
 # Shell and terminal
 brew "bash"                # macOS ships bash 3.2; this is the login shell
-brew "bash-completion@2"   # requires bash >= 4
+brew "bash-completion@2"   # requires bash >= 4; conflicts with bash-completion (v1)
 brew "tmux"
 brew "screen"              # macOS ships screen 4.00.03 (2006); kept for serial consoles
 
@@ -11,20 +13,55 @@ brew "screen"              # macOS ships screen 4.00.03 (2006); kept for serial 
 brew "chezmoi"
 brew "mise"
 
+# GNU tools, put ahead of the macOS ones on PATH by ~/.profile.d/10-homebrew.sh
+brew "coreutils"
+brew "gnu-sed"
+brew "gnu-tar"
+brew "gawk"
+brew "make"
+brew "binutils"            # appended to PATH, so the macOS toolchain still wins
+brew "e2fsprogs"
+
 # CLI
 brew "git"
 brew "git-lfs"
+brew "git-filter-repo"
 brew "gh"
-brew "peco"            # ghq comes from mise on every platform
+brew "peco"                # ghq comes from mise on every platform
 brew "fzf"
 brew "ripgrep"
 brew "fd"
 brew "jq"
+brew "yq"
 brew "tree"
+brew "pstree"
 brew "wget"
+brew "telnet"
 brew "vim"
 brew "openssl"
 brew "pkg-config"
+brew "pandoc"
+brew "graphviz"
+brew "ffmpeg"
+
+# Development
+brew "go-task"
+brew "uv"
+brew "ipython"
+brew "hf"                  # Hugging Face hub CLI
+brew "asyncapi"
+brew "cocoapods"
+brew "composer"
+brew "mysql"
+brew "mysql-client"
+brew "mysql-client@8.0"    # put on PATH by ~/.profile.d/10-homebrew.sh
+
+# Cloud and containers
+brew "awscli"
+brew "kubernetes-cli"
+brew "k3d"
+brew "cloudflared"
+brew "heroku"
 
 # GPG commit signing
 brew "gnupg"
@@ -33,17 +70,15 @@ brew "pinentry-mac"
 # Apps
 cask "bitwarden"
 cask "discord"
-cask "docker"
+cask "docker-desktop"
 cask "evernote"
 cask "figma"
 cask "google-chrome"
-cask "google-japanese-ime"
-cask "notion"
 cask "postman"
 cask "slack"
 cask "spotify"
-cask "todoist"
+cask "todoist-app"
 cask "visual-studio-code"
 cask "vivaldi"
-cask "wireshark"
+cask "wireshark-app"
 cask "zoom"

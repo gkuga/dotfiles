@@ -1,0 +1,51 @@
+# Optional macOS packages: only for Macs that need them. install.sh does not
+# install these; run
+#
+#   brew bundle --file=packages/Brewfile.extra
+#
+# Third-party taps must be trusted first (Homebrew refuses to load formulae
+# from untrusted taps):
+#
+#   brew trust --tap emqx/mqttx sacloud/usacloud messense/macos-cross-toolchains
+
+# Hardware, embedded and FPGA
+brew "qemu"
+brew "verilator"
+brew "yosys"
+brew "minicom"
+brew "lsusb"
+brew "dosfstools"
+brew "mtools"
+brew "blueutil"
+brew "mosquitto"
+brew "arm-linux-gnueabihf-binutils"
+tap "messense/macos-cross-toolchains"
+brew "messense/macos-cross-toolchains/arm-unknown-linux-gnueabihf"
+
+# Build tools and libraries (for building software from source)
+brew "cmake"
+brew "ninja"
+brew "automake"
+brew "bison"
+brew "re2c"
+brew "help2man"
+brew "texinfo"
+brew "gpatch"
+brew "gcc"
+brew "clang-format"
+brew "libiconv"
+brew "libomp"
+brew "libxml2"
+brew "gtk4"
+brew "cryptography"
+brew "opam"
+brew "wasm-tools"
+
+# Network
+brew "unbound"
+
+# Services with their own taps
+tap "emqx/mqttx"
+brew "emqx/mqttx/mqttx-cli"
+tap "sacloud/usacloud"
+brew "sacloud/usacloud/usacloud"

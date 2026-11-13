@@ -42,25 +42,47 @@ They do not carry over. Step 7 lists the usual candidates.
 
 ## 2. Install the new packages
 
-Install from the new Brewfile without switching the checkout yet:
+First clear what would make `brew bundle` fail:
+
+```sh
+# bash-completion (v1, for bash 3.2) conflicts with bash-completion@2.
+brew uninstall bash-completion
+# Taps with nothing installed from them. go-task/tap also shadows the
+# homebrew/core go-task formula and is refused as an untrusted tap.
+brew untap go-task/tap hashicorp/tap heroku/brew osx-cross/arm
+```
+
+Then install from the new Brewfile without switching the checkout yet:
 
 ```sh
 cd ~/dev/src/github.com/gkuga/dotfiles
 git fetch origin
 git show origin/master:packages/Brewfile > /tmp/Brewfile
-brew bundle --file=/tmp/Brewfile
+brew bundle --no-upgrade --file=/tmp/Brewfile
 ```
 
 This adds bash 5, bash-completion@2, tmux, chezmoi, mise and the rest. Nothing
-in `$HOME` changes yet.
+in `$HOME` changes yet. `--no-upgrade` keeps already installed packages as they
+are, so the migration does not also upgrade everything; run `brew upgrade`
+afterwards.
 
 A cask fails with "It seems there is already an App at ..." when the app was
 installed without Homebrew (here: Docker Desktop). Let Homebrew take over the
 existing app, then run `brew bundle` again:
 
 ```sh
-brew install --cask --adopt docker
-brew bundle --file=/tmp/Brewfile
+brew install --cask --adopt docker-desktop
+brew bundle --no-upgrade --file=/tmp/Brewfile
+```
+
+Hardware and build tools are in `packages/Brewfile.extra` (not installed by
+`install.sh`). This Mac already has them; to keep them managed, trust the
+third-party taps and run it as well:
+
+```sh
+git show origin/master:packages/Brewfile.extra > /tmp/Brewfile.extra
+brew trust --tap emqx/mqttx sacloud/usacloud messense/macos-cross-toolchains
+brew bundle --no-upgrade --file=/tmp/Brewfile.extra
 ```
 
 ## 3. Move the work-specific git settings out of `~/.gitconfig`
@@ -206,8 +228,15 @@ Open a new terminal and check that `echo $BASH_VERSION` prints `5.x`. Then:
 - Once everything has worked for a few days:
 
   ```sh
-  brew uninstall asdf
+  cd ~/dev/src/github.com/gkuga/dotfiles
+  # Replaced by the new setup: mise (asdf, ghq, bun) and bash (zsh-completions)
+  brew uninstall asdf ghq zsh-completions oven-sh/bun/bun
+  brew untap oven-sh/bun
   rm -rf ~/.asdf                      # about 14 GB here
+  # Anything installed that neither Brewfile lists; it asks before removing
+  # anything, so answer no to only see the list
+  cat packages/Brewfile packages/Brewfile.extra > /tmp/Brewfile.all
+  brew bundle cleanup --file=/tmp/Brewfile.all
   git -C ~/dev/src/github.com/gkuga/dotfiles stash list   # drop "pre-chezmoi local changes" when unneeded
   rm -rf ~/dotfiles-backup
   ```

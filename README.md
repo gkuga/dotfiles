@@ -90,6 +90,6 @@ chezmoi re-add             # copy back files changed in place (e.g. nvim/lazy-lo
 ```
 install.sh              entry point
 scripts/                one script per step + lib.sh
-packages/               Brewfile, apt-*.txt
+packages/               Brewfile (every Mac), Brewfile.extra (optional), apt-*.txt
 home/                   chezmoi source state (dot_bashrc -> ~/.bashrc, ...)
 ```
