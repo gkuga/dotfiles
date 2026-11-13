@@ -2,6 +2,7 @@
 # scripts). Keep it POSIX sh, fast, and silent: never print anything here.
 
 # Removes every occurrence of a directory from PATH.
+# shellcheck disable=SC2329 # used by path_prepend
 path_remove() {
   case ":$PATH:" in
     *":$1:"*) ;;
