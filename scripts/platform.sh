@@ -51,8 +51,9 @@ ini_set() {
 }
 
 platform_darwin() {
-  # Docker Desktop puts its CLI in /usr/local/bin.
-  if ! has docker && [ ! -x /usr/local/bin/docker ]; then
+  # Look for the app, not only the CLI: the CLI links appear on its first
+  # launch, and with the "User" CLI location they live in ~/.docker/bin.
+  if [ ! -d /Applications/Docker.app ] && [ ! -d "$HOME/Applications/Docker.app" ] && ! has docker; then
     warn "docker not found: install Docker Desktop from https://www.docker.com/products/docker-desktop/"
     warn "(not in the Brewfile: it updates itself)"
   fi

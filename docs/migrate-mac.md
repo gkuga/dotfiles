@@ -69,23 +69,28 @@ in `$HOME` changes yet. `--no-upgrade` keeps already installed packages as they
 are, so the migration does not also upgrade everything; run `brew upgrade`
 afterwards.
 
-Docker Desktop is not in the Brewfile: it updates itself, so the existing app
-stays as it is. Do not `brew install --cask --adopt docker-desktop` either:
-macOS App Management protection makes the adoption fail halfway (`chmod ...
-Operation not permitted`) while Homebrew still records the cask as installed.
-If that happened, remove only Homebrew's record. Never run
-`brew uninstall --cask docker-desktop`, which deletes `/Applications/Docker.app`:
+Docker Desktop is not in the Brewfile because it updates itself; a cask on
+top of that drifts out of sync. The existing app stays as it is.
+
+If Homebrew still has a record of `docker-desktop` (`brew list --cask
+docker-desktop` succeeds: an earlier cask install, or an `--adopt` that failed
+halfway with `chmod ... Operation not permitted`), remove only that record.
+Otherwise `brew bundle cleanup` in step 7 offers to uninstall it, and
+`brew uninstall --cask docker-desktop` deletes `/Applications/Docker.app`.
 
 ```sh
+# rm -rf removes the symlinks in there without following them into /Applications.
 C="$(brew --prefix)/Caskroom/docker-desktop"
-rm "$C"/*/Docker.app        # a symlink to /Applications/Docker.app; the app stays
-rm -rf "$C"
+[ -d "$C" ] && rm -rf "$C"
+brew list --cask docker-desktop     # now an error: Homebrew forgot it
+ls -d /Applications/Docker.app      # the app is still there
 ```
 
-Another cask that fails with "It seems there is already an App at ..." was
-installed without Homebrew. Either keep it outside Homebrew like Docker
-Desktop, or give the terminal "App Management" access (System Settings >
-Privacy & Security), quit the app and run `brew install --cask --adopt <cask>`.
+Any other cask that fails with "It seems there is already an App at ..." was
+installed without Homebrew and does not update itself, so let Homebrew take it
+over: give the terminal "App Management" access (System Settings > Privacy &
+Security), quit the app, then `brew install --cask --adopt <cask>`. Without
+that access the adoption fails halfway, as above.
 
 Hardware, build and project-specific tools are in `packages/Brewfile.extra`
 (not installed by `install.sh`). This Mac already has them; to keep them
@@ -246,7 +251,8 @@ Open a new terminal and check that `echo $BASH_VERSION` prints `5.x`. Then:
   rm -rf ~/.asdf                      # about 14 GB here
   # Anything installed that neither Brewfile lists; it asks before removing
   # anything, so answer no to only see the list. Leave out Brewfile.extra if
-  # you did not install it.
+  # you did not install it. If it lists docker-desktop, answer no and remove
+  # Homebrew's record first (step 2): uninstalling it deletes Docker.app.
   cat packages/Brewfile packages/Brewfile.extra > /tmp/Brewfile.all
   brew bundle cleanup --file=/tmp/Brewfile.all
   git stash list                      # drop "pre-chezmoi local changes" when unneeded
