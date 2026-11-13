@@ -13,7 +13,9 @@ brew "screen"              # macOS ships screen 4.00.03 (2006); kept for serial 
 brew "chezmoi"
 brew "mise"
 
-# GNU tools, put ahead of the macOS ones on PATH by ~/.profile.d/10-homebrew.sh
+# GNU tools. ~/.profile.d/10-homebrew.sh puts gnu-sed, gawk, make and e2fsprogs
+# ahead of the macOS tools on PATH; coreutils and gnu-tar stay g-prefixed
+# (gls, gdate, gtar, ...) so that macOS scripts keep the BSD versions.
 brew "coreutils"
 brew "gnu-sed"
 brew "gnu-tar"
@@ -42,18 +44,12 @@ brew "openssl"
 brew "pkg-config"
 brew "pandoc"
 brew "graphviz"
-brew "ffmpeg"
 
 # Development
 brew "go-task"
 brew "uv"
 brew "ipython"
 brew "hf"                  # Hugging Face hub CLI
-brew "asyncapi"
-brew "cocoapods"
-brew "composer"
-brew "mysql"
-brew "mysql-client"
 brew "mysql-client@8.0"    # put on PATH by ~/.profile.d/10-homebrew.sh
 
 # Cloud and containers
@@ -61,7 +57,6 @@ brew "awscli"
 brew "kubernetes-cli"
 brew "k3d"
 brew "cloudflared"
-brew "heroku"
 
 # GPG commit signing
 brew "gnupg"

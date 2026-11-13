@@ -46,10 +46,13 @@ First clear what would make `brew bundle` fail:
 
 ```sh
 # bash-completion (v1, for bash 3.2) conflicts with bash-completion@2.
-brew uninstall bash-completion
+brew list bash-completion >/dev/null 2>&1 && brew uninstall bash-completion
 # Taps with nothing installed from them. go-task/tap also shadows the
 # homebrew/core go-task formula and is refused as an untrusted tap.
-brew untap go-task/tap hashicorp/tap heroku/brew osx-cross/arm
+# One at a time: brew untap stops at a tap that is missing or still in use.
+for t in go-task/tap hashicorp/tap heroku/brew osx-cross/arm; do
+  brew untap "$t" || echo "kept $t"
+done
 ```
 
 Then install from the new Brewfile without switching the checkout yet:
@@ -75,13 +78,12 @@ brew install --cask --adopt docker-desktop
 brew bundle --no-upgrade --file=/tmp/Brewfile
 ```
 
-Hardware and build tools are in `packages/Brewfile.extra` (not installed by
-`install.sh`). This Mac already has them; to keep them managed, trust the
-third-party taps and run it as well:
+Hardware, build and project-specific tools are in `packages/Brewfile.extra`
+(not installed by `install.sh`). This Mac already has them; to keep them
+managed, run it as well. It declares its third-party taps as trusted.
 
 ```sh
 git show origin/master:packages/Brewfile.extra > /tmp/Brewfile.extra
-brew trust --tap emqx/mqttx sacloud/usacloud messense/macos-cross-toolchains
 brew bundle --no-upgrade --file=/tmp/Brewfile.extra
 ```
 
@@ -234,10 +236,11 @@ Open a new terminal and check that `echo $BASH_VERSION` prints `5.x`. Then:
   brew untap oven-sh/bun
   rm -rf ~/.asdf                      # about 14 GB here
   # Anything installed that neither Brewfile lists; it asks before removing
-  # anything, so answer no to only see the list
+  # anything, so answer no to only see the list. Leave out Brewfile.extra if
+  # you did not install it.
   cat packages/Brewfile packages/Brewfile.extra > /tmp/Brewfile.all
   brew bundle cleanup --file=/tmp/Brewfile.all
-  git -C ~/dev/src/github.com/gkuga/dotfiles stash list   # drop "pre-chezmoi local changes" when unneeded
+  git stash list                      # drop "pre-chezmoi local changes" when unneeded
   rm -rf ~/dotfiles-backup
   ```
 
