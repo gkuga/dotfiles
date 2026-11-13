@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Installs mise and the global tools defined in ~/.config/mise/config.toml
-# (managed by chezmoi, so run the dotfiles step first).
+# (managed by chezmoi, so run the dotfiles step first), and the Claude Code CLI.
 set -euo pipefail
 # shellcheck source=lib.sh
 . "$(dirname "$0")/lib.sh"
@@ -14,6 +14,14 @@ if ! has mise; then
     log "installing mise into ~/.local/bin"
     run_installer sh https://mise.run
   fi
+fi
+
+# Claude Code CLI (used directly and by claudecode.nvim). The native installer
+# puts it in ~/.local/bin and keeps it up to date by itself, so it is not a
+# mise tool.
+if ! has claude; then
+  log "installing Claude Code into ~/.local/bin"
+  run_installer bash https://claude.ai/install.sh
 fi
 
 if [ ! -f "$HOME/.config/mise/config.toml" ]; then
