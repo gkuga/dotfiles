@@ -13,11 +13,23 @@ REPO_URL="https://github.com/gkuga/dotfiles.git"
 REPO_DIR="${DOTFILES_DIR:-$HOME/dev/src/github.com/gkuga/dotfiles}"
 ALL_STEPS="packages dotfiles mise platform shell"
 
+# Not read from "$0": that is just "bash" when piped from curl.
 usage() {
-  sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+  cat >&2 <<'EOF'
+Usage: install.sh [--dry-run] [--yes] [--only STEP[,STEP...]]
+
+  -n, --dry-run  print what would change, change nothing
+  -y, --yes      answer yes to every confirmation
+      --only     run only the given steps
+  -h, --help     show this help
+
+Steps (in order): packages, dotfiles, mise, platform, shell
+EOF
   exit "${1:-0}"
 }
 
+# Kept for the re-exec below; the option loop shifts "$@" away.
+ORIG_ARGS=("$@")
 STEPS="$ALL_STEPS"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -33,6 +45,13 @@ done
 # When piped from curl there is no checkout yet: clone it, then re-exec.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
 if [ ! -f "$SCRIPT_DIR/scripts/lib.sh" ]; then
+  if [ "${DRY_RUN:-0}" = 1 ]; then
+    # A dry run must not leave a checkout behind in $HOME.
+    REPO_DIR="$(mktemp -d)/dotfiles"
+    echo "dry-run: using a temporary checkout in $REPO_DIR" >&2
+  elif [ -d "$REPO_DIR/.git" ]; then
+    echo "using the existing checkout in $REPO_DIR (run git pull there to update it)" >&2
+  fi
   if [ ! -d "$REPO_DIR/.git" ]; then
     command -v git >/dev/null 2>&1 || {
       echo "git is required. On macOS run: xcode-select --install" >&2
@@ -41,7 +60,13 @@ if [ ! -f "$SCRIPT_DIR/scripts/lib.sh" ]; then
     }
     git clone "$REPO_URL" "$REPO_DIR"
   fi
-  exec bash "$REPO_DIR/install.sh" "$@"
+  # stdin is the curl pipe here. Hand the terminal to the real run so that
+  # installers (Homebrew, sudo) can prompt instead of failing non-interactively.
+  # ${a[@]+...} keeps bash 3.2 from failing on an empty array under set -u.
+  if { : </dev/tty; } 2>/dev/null; then
+    exec bash "$REPO_DIR/install.sh" ${ORIG_ARGS[@]+"${ORIG_ARGS[@]}"} </dev/tty
+  fi
+  exec bash "$REPO_DIR/install.sh" ${ORIG_ARGS[@]+"${ORIG_ARGS[@]}"}
 fi
 REPO_DIR="$SCRIPT_DIR"
 export REPO_DIR
