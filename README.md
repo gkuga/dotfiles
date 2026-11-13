@@ -17,7 +17,7 @@ Environment: bash 5, tmux (screen kept for serial consoles), Neovim
 
 ```sh
 # Fresh machine
-curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/main/install.sh | bash
 
 # From a checkout
 ./install.sh --dry-run          # print what would change, change nothing
