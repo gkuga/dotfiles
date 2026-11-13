@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Platform-specific system setup that does not fit into a package list.
-#   darwin: nothing yet
+#   darwin: Docker Desktop is installed by hand (it updates itself); warn if missing
 #   wsl:    /etc/wsl.conf (systemd, default user); Docker comes from Docker Desktop
 #   linux:  Docker Engine from the official Docker apt repository
 set -euo pipefail
@@ -48,6 +48,14 @@ ini_set() {
     { print }
     END { emit(); if (!done) { if (NR) print ""; print "[" sec "]"; print key "=" val } }
   '
+}
+
+platform_darwin() {
+  # Docker Desktop puts its CLI in /usr/local/bin.
+  if ! has docker && [ ! -x /usr/local/bin/docker ]; then
+    warn "docker not found: install Docker Desktop from https://www.docker.com/products/docker-desktop/"
+    warn "(not in the Brewfile: it updates itself)"
+  fi
 }
 
 platform_wsl() {
@@ -104,7 +112,7 @@ Signed-By: /etc/apt/keyrings/docker.asc"
 }
 
 case "$PLATFORM" in
-  darwin) ;;
+  darwin) platform_darwin ;;
   wsl)    platform_wsl ;;
   linux)  platform_linux ;;
 esac

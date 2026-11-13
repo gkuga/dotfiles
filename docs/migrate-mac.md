@@ -69,14 +69,23 @@ in `$HOME` changes yet. `--no-upgrade` keeps already installed packages as they
 are, so the migration does not also upgrade everything; run `brew upgrade`
 afterwards.
 
-A cask fails with "It seems there is already an App at ..." when the app was
-installed without Homebrew (here: Docker Desktop). Let Homebrew take over the
-existing app, then run `brew bundle` again:
+Docker Desktop is not in the Brewfile: it updates itself, so the existing app
+stays as it is. Do not `brew install --cask --adopt docker-desktop` either:
+macOS App Management protection makes the adoption fail halfway (`chmod ...
+Operation not permitted`) while Homebrew still records the cask as installed.
+If that happened, remove only Homebrew's record. Never run
+`brew uninstall --cask docker-desktop`, which deletes `/Applications/Docker.app`:
 
 ```sh
-brew install --cask --adopt docker-desktop
-brew bundle --no-upgrade --file=/tmp/Brewfile
+C="$(brew --prefix)/Caskroom/docker-desktop"
+rm "$C"/*/Docker.app        # a symlink to /Applications/Docker.app; the app stays
+rm -rf "$C"
 ```
+
+Another cask that fails with "It seems there is already an App at ..." was
+installed without Homebrew. Either keep it outside Homebrew like Docker
+Desktop, or give the terminal "App Management" access (System Settings >
+Privacy & Security), quit the app and run `brew install --cask --adopt <cask>`.
 
 Hardware, build and project-specific tools are in `packages/Brewfile.extra`
 (not installed by `install.sh`). This Mac already has them; to keep them

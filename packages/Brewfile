@@ -62,10 +62,11 @@ brew "cloudflared"
 brew "gnupg"
 brew "pinentry-mac"
 
-# Apps
+# Apps. Docker Desktop is not here: it updates itself, and a cask on top of
+# that drifts out of sync. Install it from docker.com (scripts/platform.sh warns
+# when it is missing).
 cask "bitwarden"
 cask "discord"
-cask "docker-desktop"
 cask "evernote"
 cask "figma"
 cask "google-chrome"
