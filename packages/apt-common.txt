@@ -20,7 +20,6 @@ screen
 git
 git-lfs
 gh
-peco
 fzf
 ripgrep
 fd-find

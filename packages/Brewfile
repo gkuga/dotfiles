@@ -29,7 +29,7 @@ brew "git"
 brew "git-lfs"
 brew "git-filter-repo"
 brew "gh"
-brew "peco"                # ghq comes from mise on every platform
+# ghq and peco come from mise on every platform
 brew "fzf"
 brew "ripgrep"
 brew "fd"

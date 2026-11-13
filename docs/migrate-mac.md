@@ -255,8 +255,8 @@ Open a new terminal and check that `echo $BASH_VERSION` prints `5.x`. Then:
 
   ```sh
   cd ~/dev/src/github.com/gkuga/dotfiles
-  # Replaced by the new setup: mise (asdf, ghq, bun) and bash (zsh-completions)
-  brew uninstall asdf ghq zsh-completions oven-sh/bun/bun
+  # Replaced by the new setup: mise (asdf, ghq, peco, bun) and bash (zsh-completions)
+  brew uninstall asdf ghq peco zsh-completions oven-sh/bun/bun
   brew untap oven-sh/bun
   rm -rf ~/.asdf                      # about 14 GB here
   # Anything installed that neither Brewfile lists; it asks before removing
