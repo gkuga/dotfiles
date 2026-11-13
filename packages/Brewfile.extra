@@ -1,0 +1,57 @@
+# Optional macOS packages: only for Macs that need them. install.sh does not
+# install these; run
+#
+#   brew bundle --file=packages/Brewfile.extra
+#
+# Homebrew refuses to load formulae from third-party taps that are not trusted,
+# so those taps are declared with `trusted: true` below.
+
+# Hardware, embedded and FPGA
+brew "qemu"
+brew "verilator"
+brew "yosys"
+brew "minicom"
+brew "lsusb"
+brew "dosfstools"
+brew "mtools"
+brew "blueutil"
+brew "mosquitto"
+brew "arm-linux-gnueabihf-binutils"
+tap "messense/macos-cross-toolchains", trusted: true
+brew "messense/macos-cross-toolchains/arm-unknown-linux-gnueabihf"
+
+# Build tools and libraries (for building software from source)
+brew "cmake"
+brew "ninja"
+brew "automake"
+brew "bison"
+brew "re2c"
+brew "help2man"
+brew "texinfo"
+brew "gpatch"
+brew "gcc"
+brew "clang-format"
+brew "libiconv"
+brew "libomp"
+brew "libxml2"
+brew "gtk4"
+brew "cryptography"
+brew "opam"
+brew "wasm-tools"
+
+# Project-specific development (heavy, or only for some projects)
+brew "mysql"               # server; the client on PATH is mysql-client@8.0 in Brewfile
+brew "cocoapods"
+brew "composer"
+brew "ffmpeg"
+brew "heroku"
+brew "asyncapi"
+
+# Network
+brew "unbound"
+
+# Services with their own taps
+tap "emqx/mqttx", trusted: true
+brew "emqx/mqttx/mqttx-cli"
+tap "sacloud/usacloud", trusted: true
+brew "sacloud/usacloud/usacloud"
