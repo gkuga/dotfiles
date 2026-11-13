@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Bootstrap a development environment on macOS, WSL or a Linux host.
 #
-#   curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/master/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/main/install.sh | bash
 #   ./install.sh [--dry-run] [--yes] [--only STEP[,STEP...]]
 #
 # Steps (in order): packages, dotfiles, mise, platform, shell

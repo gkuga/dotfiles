@@ -8,7 +8,7 @@ The checkout is `~/dev/src/github.com/gkuga/dotfiles` (the default `REPO_DIR`
 of `install.sh`).
 
 > [!IMPORTANT]
-> The old dotfiles are symlinks into that checkout, and current `master`
+> The old dotfiles are symlinks into that checkout, and current `main`
 > deletes or renames those files. Do **not** `git pull` until step 4: an early
 > pull leaves the links dangling.
 >
@@ -68,7 +68,7 @@ Then install from the new Brewfile without switching the checkout yet:
 ```sh
 cd ~/dev/src/github.com/gkuga/dotfiles
 git fetch origin
-git show origin/master:packages/Brewfile > /tmp/Brewfile
+git show origin/main:packages/Brewfile > /tmp/Brewfile
 brew bundle --no-upgrade --file=/tmp/Brewfile
 ```
 
@@ -107,7 +107,7 @@ first run, "Cannot check whether ... is outdated because its tap is not
 trusted" warnings still appear and can be ignored.
 
 ```sh
-git show origin/master:packages/Brewfile.extra > /tmp/Brewfile.extra
+git show origin/main:packages/Brewfile.extra > /tmp/Brewfile.extra
 brew bundle --no-upgrade --file=/tmp/Brewfile.extra
 ```
 
@@ -142,7 +142,7 @@ find ~ -maxdepth 1 -type l -lname '*gkuga/dotfiles*' -print -delete
 
 # Local changes to deleted files (e.g. zshrc) would block the pull.
 git stash push --include-untracked -m "pre-chezmoi local changes"
-git switch master
+git switch main                    # was master before the rename; git sets up main from origin/main
 git pull --ff-only
 ```
 
@@ -274,7 +274,7 @@ Open a new terminal and check that `echo $BASH_VERSION` prints `5.x`. Then:
 This restores the old dotfiles while `~/.asdf` and `~/dotfiles-backup` still
 exist. The new Homebrew packages, mise tools and the Claude Code CLI can stay;
 the old setup ignores them. Run it from bash, with the checkout still on
-`master`: chezmoi needs the new source to list the files it manages.
+`main`: chezmoi needs the new source to list the files it manages.
 
 ```sh
 cd ~/dev/src/github.com/gkuga/dotfiles
