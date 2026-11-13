@@ -17,6 +17,14 @@ of `install.sh`).
 > working. A new terminal after step 4 starts zsh without any rc file and may
 > show zsh's first-run menu ("This is the Z Shell configuration function for
 > new users"): press `q` so that it writes nothing.
+>
+> Interactive zsh does not treat `#` as a comment by default, so a trailing
+> comment in the commands below would be passed on as arguments. Run this
+> first in that terminal:
+>
+> ```sh
+> setopt interactivecomments
+> ```
 
 Most of the time goes into `brew bundle` and `mise install`.
 
@@ -94,7 +102,9 @@ that access the adoption fails halfway, as above.
 
 Hardware, build and project-specific tools are in `packages/Brewfile.extra`
 (not installed by `install.sh`). This Mac already has them; to keep them
-managed, run it as well. It declares its third-party taps as trusted.
+managed, run it as well. It declares its third-party taps as trusted; on the
+first run, "Cannot check whether ... is outdated because its tap is not
+trusted" warnings still appear and can be ignored.
 
 ```sh
 git show origin/master:packages/Brewfile.extra > /tmp/Brewfile.extra

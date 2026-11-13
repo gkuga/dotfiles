@@ -16,7 +16,8 @@ brew "dosfstools"
 brew "mtools"
 brew "blueutil"
 brew "mosquitto"
-brew "arm-linux-gnueabihf-binutils"
+# The toolchain includes binutils; the separate arm-linux-gnueabihf-binutils
+# formula would fight it over the arm-linux-gnueabihf-* links.
 tap "messense/macos-cross-toolchains", trusted: true
 brew "messense/macos-cross-toolchains/arm-unknown-linux-gnueabihf"
 
@@ -53,5 +54,3 @@ brew "unbound"
 # Services with their own taps
 tap "emqx/mqttx", trusted: true
 brew "emqx/mqttx/mqttx-cli"
-tap "sacloud/usacloud", trusted: true
-brew "sacloud/usacloud/usacloud"
