@@ -25,6 +25,9 @@ curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/master/install.sh | 
 ./install.sh --only dotfiles    # a single step
 ```
 
+A Mac still on the old symlinked zsh/asdf setup needs a few manual steps first:
+see [docs/migrate-mac.md](docs/migrate-mac.md).
+
 Steps run in this order; each one is idempotent:
 
 | Step | macOS | WSL | Linux host |
