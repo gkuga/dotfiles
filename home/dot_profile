@@ -1,20 +1,27 @@
-export PATH="$HOME/bin:$PATH"
+# Environment for every shell, interactive or not (also read by AI agents and
+# scripts). Keep it POSIX sh, fast, and silent: never print anything here.
 
-if [ -d $HOME/.profile.d ]; then
-  for i in $HOME/.profile.d/*.sh; do
-    if [ -r $i ]; then
-      . $i
-    fi
+# Prepend a directory to PATH if it exists and is not already there.
+path_prepend() {
+  case ":$PATH:" in
+    *":$1:"*) ;;
+    *) [ -d "$1" ] && PATH="$1:$PATH" ;;
+  esac
+  return 0
+}
+
+if [ -d "$HOME/.profile.d" ]; then
+  for i in "$HOME"/.profile.d/*.sh; do
+    [ -r "$i" ] && . "$i"
   done
   unset i
 fi
 
-if [[ -f ~/.bashrc ]] ; then
-    . ~/.bashrc
-fi
+unset -f path_prepend
+export PATH
 
-# AsyncAPI CLI Autocomplete
+export EDITOR=nvim
+export VISUAL=nvim
 
-ASYNCAPI_AC_BASH_SETUP_PATH=/Users/gkuga/Library/Caches/@asyncapi/cli/autocomplete/bash_setup && test -f $ASYNCAPI_AC_BASH_SETUP_PATH && source $ASYNCAPI_AC_BASH_SETUP_PATH; # asyncapi autocomplete setup
-
-
+# Lets ~/.bashrc know the environment is already set up.
+export __PROFILE_LOADED=1

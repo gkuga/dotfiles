@@ -1,0 +1,16 @@
+{{- /* Per-machine values. Asked once on `chezmoi init`, then stored in
+       ~/.config/chezmoi/chezmoi.toml (never committed). */ -}}
+{{- $name := promptStringOnce . "name" "Git user.name" "Gaku Yasui" -}}
+{{- $email := promptStringOnce . "email" "Git user.email" -}}
+{{- $gpgsign := promptBoolOnce . "gpgsign" "Sign git commits with GPG" true -}}
+{{- $signingkey := promptStringOnce . "signingkey" "GPG signing key ID (empty = gpg default key)" "" -}}
+{{- $wsl := false -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   $wsl = .chezmoi.kernel.osrelease | lower | contains "microsoft" -}}
+{{- end -}}
+[data]
+  name = {{ $name | quote }}
+  email = {{ $email | quote }}
+  gpgsign = {{ $gpgsign }}
+  signingkey = {{ $signingkey | quote }}
+  wsl = {{ $wsl }}

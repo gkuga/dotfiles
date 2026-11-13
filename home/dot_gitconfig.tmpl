@@ -1,23 +1,38 @@
+[user]
+  name = {{ .name }}
+  email = {{ .email }}
+{{- if .signingkey }}
+  signingkey = {{ .signingkey }}
+{{- end }}
+{{- if .gpgsign }}
+[commit]
+  gpgsign = true
+[tag]
+  gpgsign = true
+{{- end }}
 [alias]
   tr = log --graph --pretty='format:%C(yellow)%h%Creset %s %Cgreen(%an)%Creset %Cred%d%Creset'
+  trc = log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cd %Cblue%cn %Cred%d %Creset%s'
   co = checkout
   ci = commit
   st = status
   br = branch
-  trc = log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cd %Cblue%cn %Cred%d %Creset%s'
 [color]
   ui = true
 [core]
-  editor = vim -c \"set fenc=utf-8\"
-[user]
-  email = gaku.yasui@gmail.com
-  name  = Gaku Yasui
-[ghq]
-  root = /home/gkuga/dev/src
+  editor = nvim
 [init]
   defaultBranch = main
+[submodule]
+  recurse = true
+[ghq]
+  root = {{ .chezmoi.homeDir }}/dev/src
 [filter "lfs"]
   process = git-lfs filter-process
   required = true
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
+# Machine- or work-specific settings (url.insteadOf, credential helpers, ...)
+# live in ~/.gitconfig.local, which is not managed by this repository.
+[include]
+  path = ~/.gitconfig.local

@@ -1,1 +1,1 @@
-export GHQ_ROOT=$HOME/dev/src
+export GHQ_ROOT="$HOME/dev/src"
