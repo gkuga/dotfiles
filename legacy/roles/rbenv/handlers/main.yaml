@@ -1,2 +1,0 @@
-- name: build
-  shell: cd $HOME/.rbenv && src/configure && make -C src

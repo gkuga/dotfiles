@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # Prompt:
-#   host:~/dev/src/github.com/gkuga/workspace (main *)
+#   host:~/dev/src/github.com/gkuga/dotfiles (main *)
 #   $
 
 for f in \

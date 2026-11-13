@@ -1,5 +1,0 @@
-version: 2.9.5
-prefix_dir: /usr/local
-src_dir: "{{ prefix_dir }}/src"
-bin_dir: "{{ prefix_dir }}/bin"
-

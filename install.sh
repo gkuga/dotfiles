@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Bootstrap a development environment on macOS, WSL or a Linux host.
 #
-#   curl -fsSL https://raw.githubusercontent.com/gkuga/workspace/master/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/master/install.sh | bash
 #   ./install.sh [--dry-run] [--yes] [--only STEP[,STEP...]]
 #
 # Steps (in order): packages, dotfiles, mise, platform, shell
@@ -9,8 +9,8 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/gkuga/workspace.git"
-REPO_DIR="${WORKSPACE_DIR:-$HOME/dev/src/github.com/gkuga/workspace}"
+REPO_URL="https://github.com/gkuga/dotfiles.git"
+REPO_DIR="${DOTFILES_DIR:-$HOME/dev/src/github.com/gkuga/dotfiles}"
 ALL_STEPS="packages dotfiles mise platform shell"
 
 usage() {

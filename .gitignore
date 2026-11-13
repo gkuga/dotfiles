@@ -1,10 +1,2 @@
-# Vagrant
-.vagrant
-.env
-ssh-config
-
-# Ansible
-*.retry
-
-# Vim
 *.swp
+.DS_Store

@@ -1,5 +1,0 @@
-- become: "{{ should_be_root }}"
-  ansible.builtin.package:
-    name:
-    - tmux
-    state: present

@@ -1,4 +1,4 @@
-# workspace
+# dotfiles
 
 Scripts and dotfiles that set up my development environment on macOS, WSL and
 Linux hosts (Debian-based).
@@ -17,7 +17,7 @@ Environment: bash 5, tmux (screen kept for serial consoles), Neovim
 
 ```sh
 # Fresh machine
-curl -fsSL https://raw.githubusercontent.com/gkuga/workspace/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/master/install.sh | bash
 
 # From a checkout
 ./install.sh --dry-run          # print what would change, change nothing
@@ -61,5 +61,4 @@ install.sh              entry point
 scripts/                one script per step + lib.sh
 packages/               Brewfile, apt-*.txt
 home/                   chezmoi source state (dot_bashrc -> ~/.bashrc, ...)
-legacy/                 previous Ansible setup, to be removed
 ```

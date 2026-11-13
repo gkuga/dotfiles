@@ -1,2 +1,0 @@
-- name: build
-  shell: cd $HOME/github.com/git/git/ && make prefix=/usr/local all && make prefix=/usr/local install
