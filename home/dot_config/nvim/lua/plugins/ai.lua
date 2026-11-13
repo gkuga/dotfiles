@@ -13,6 +13,8 @@ return {
       -- so Node.js (mise has 20, the nodejs server wants 22+) is not needed.
       suggestion = {
         auto_trigger = true, -- like copilot.vim
+        -- Otherwise <M-w> with no suggestion yet is swallowed to request one.
+        trigger_on_accept = false,
         -- Hidden while the blink.cmp menu is open (hide_during_completion).
         keymap = {
           accept = false, -- <Tab>, see plugins/completion.lua
@@ -32,7 +34,10 @@ return {
   -- (installed by scripts/mise.sh).
   {
     "coder/claudecode.nvim",
-    -- Command stubs so that :ClaudeCode works before any key is pressed.
+    -- Load (and start the IDE server) right after startup, so that `claude`
+    -- in another tmux pane finds this Neovim with /ide before any key is used.
+    event = "VeryLazy",
+    -- Command stubs for the moment before VeryLazy (e.g. `nvim +ClaudeCode`).
     cmd = {
       "ClaudeCode",
       "ClaudeCodeFocus",
@@ -79,10 +84,14 @@ return {
           -- Claude Code uses <Esc> (interrupt) and <Esc><Esc> (rewind) itself:
           -- send it at once instead of waiting for the global <Esc><Esc>.
           tmap("<Esc>", "<Esc>", "Send <Esc> to Claude")
+          -- Leave terminal mode; then <C-w>h etc. move between windows. Other
+          -- control keys (<C-j> newline, <C-k>, <C-l>, ...) stay with Claude Code.
           tmap("<C-q>", [[<C-\><C-n>]], "Leave terminal mode")
-          for _, key in ipairs({ "h", "j", "k", "l" }) do
-            tmap("<C-" .. key .. ">", [[<C-\><C-n><C-w>]] .. key, "Go to window " .. key)
-          end
+          -- Coming back from another window: type to Claude again right away.
+          vim.api.nvim_create_autocmd("BufEnter", {
+            buffer = ev.buf,
+            callback = function() vim.cmd.startinsert() end,
+          })
         end,
       })
     end,

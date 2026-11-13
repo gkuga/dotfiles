@@ -5,7 +5,9 @@ set -euo pipefail
 # shellcheck source=lib.sh
 . "$(dirname "$0")/lib.sh"
 
-export PATH="$HOME/.local/bin:$PATH"
+# Same lookup as a login shell, so that tools installed through mise (e.g. a
+# claude from npm) are found as well.
+export PATH="${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims:$HOME/.local/bin:$PATH"
 
 if ! has mise; then
   if has brew; then

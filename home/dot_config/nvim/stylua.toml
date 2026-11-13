@@ -1,4 +1,5 @@
-# Matches the existing style; conform runs stylua on save (plugins/format.lua).
+# conform runs stylua on save (plugins/format.lua). Two-space indent as before
+# (stylua's default is tabs); one-line functions are kept on one line.
 indent_type = "Spaces"
 indent_width = 2
 column_width = 120
