@@ -1,0 +1,49 @@
+# macOS packages. Language runtimes and neovim come from mise
+# (~/.config/mise/config.toml), not from Homebrew.
+
+# Shell and terminal
+brew "bash"                # macOS ships bash 3.2; this is the login shell
+brew "bash-completion@2"   # requires bash >= 4
+brew "tmux"
+brew "screen"              # macOS ships screen 4.00.03 (2006); kept for serial consoles
+
+# Dotfiles and tools
+brew "chezmoi"
+brew "mise"
+
+# CLI
+brew "git"
+brew "git-lfs"
+brew "gh"
+brew "peco"            # ghq comes from mise on every platform
+brew "fzf"
+brew "ripgrep"
+brew "fd"
+brew "jq"
+brew "tree"
+brew "wget"
+brew "vim"
+brew "openssl"
+brew "pkg-config"
+
+# GPG commit signing
+brew "gnupg"
+brew "pinentry-mac"
+
+# Apps
+cask "bitwarden"
+cask "discord"
+cask "docker"
+cask "evernote"
+cask "figma"
+cask "google-chrome"
+cask "google-japanese-ime"
+cask "notion"
+cask "postman"
+cask "slack"
+cask "spotify"
+cask "todoist"
+cask "visual-studio-code"
+cask "vivaldi"
+cask "wireshark"
+cask "zoom"

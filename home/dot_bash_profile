@@ -1,0 +1,7 @@
+# Login shell (macOS terminals, ssh, tmux panes): environment, then interactive settings.
+if [ -r "$HOME/.profile" ]; then
+  . "$HOME/.profile"
+fi
+case $- in
+  *i*) [ -r "$HOME/.bashrc" ] && . "$HOME/.bashrc" ;;
+esac

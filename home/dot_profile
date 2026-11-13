@@ -1,0 +1,55 @@
+# Environment for every shell, interactive or not (also read by AI agents and
+# scripts). Keep it POSIX sh, fast, and silent: never print anything here.
+
+# Removes every occurrence of a directory from PATH.
+# shellcheck disable=SC2329 # used by path_prepend
+path_remove() {
+  case ":$PATH:" in
+    *":$1:"*) ;;
+    *) return 0 ;;
+  esac
+  _path_new="" _path_ifs="$IFS"
+  IFS=:
+  for _path_dir in $PATH; do
+    [ "$_path_dir" = "$1" ] || _path_new="${_path_new:+$_path_new:}$_path_dir"
+  done
+  IFS="$_path_ifs"
+  PATH="$_path_new"
+  unset _path_new _path_ifs _path_dir
+}
+
+# Moves a directory to the front of PATH if it exists. Moving (not skipping)
+# matters on macOS: in nested login shells (tmux, bash -l) /etc/profile's
+# path_helper has already pushed the inherited entries behind /usr/bin.
+# shellcheck disable=SC2329 # used by ~/.profile.d/*.sh
+path_prepend() {
+  [ -d "$1" ] || return 0
+  path_remove "$1"
+  PATH="$1${PATH:+:$PATH}"
+}
+
+# Appends a directory to PATH if it exists and is not already there.
+# shellcheck disable=SC2329 # used by ~/.profile.d/*.sh
+path_append() {
+  [ -d "$1" ] || return 0
+  case ":$PATH:" in
+    *":$1:"*) ;;
+    *) PATH="${PATH:+$PATH:}$1" ;;
+  esac
+}
+
+if [ -d "$HOME/.profile.d" ]; then
+  for i in "$HOME"/.profile.d/*.sh; do
+    [ -r "$i" ] && . "$i"
+  done
+  unset i
+fi
+
+unset -f path_remove path_prepend path_append
+export PATH
+
+export EDITOR=nvim
+export VISUAL=nvim
+
+# Lets ~/.bashrc know the environment is already set up.
+export __PROFILE_LOADED=1

@@ -1,0 +1,26 @@
+# Interactive bash settings. Environment variables belong in ~/.profile.
+# Keep this silent: AI agents and IDEs may source it and read the output.
+
+# Not interactive: stop here.
+case $- in
+  *i*) ;;
+  *) return ;;
+esac
+
+# Non-login interactive shells (e.g. some terminal emulators on Linux) have
+# not read ~/.profile yet.
+if [ -z "${__PROFILE_LOADED:-}" ] && [ -r "$HOME/.profile" ]; then
+  . "$HOME/.profile"
+fi
+
+if [ -d "$HOME/.bash.d" ]; then
+  for script in "$HOME"/.bash.d/*.sh; do
+    [ -r "$script" ] && . "$script"
+  done
+  unset script
+fi
+
+# Machine-specific settings that are not managed by chezmoi.
+if [ -r "$HOME/.bashrc.local" ]; then
+  . "$HOME/.bashrc.local"
+fi

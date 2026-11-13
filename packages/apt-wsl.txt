@@ -1,0 +1,4 @@
+# WSL only. Docker comes from Docker Desktop's WSL integration.
+
+# wslview (open URLs/files with Windows apps); skipped if not in the repositories
+wslu

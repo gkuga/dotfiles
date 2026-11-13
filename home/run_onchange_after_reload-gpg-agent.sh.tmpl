@@ -1,0 +1,6 @@
+#!/bin/sh
+# Re-run whenever gpg-agent.conf changes.
+# gpg-agent.conf hash: {{ include "private_dot_gnupg/gpg-agent.conf.tmpl" | sha256sum }}
+if command -v gpgconf >/dev/null 2>&1; then
+  gpgconf --reload gpg-agent || true
+fi

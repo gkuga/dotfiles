@@ -1,0 +1,29 @@
+" Minimal fallback for machines without neovim. No plugins on purpose:
+" the full setup lives in ~/.config/nvim.
+
+let mapleader = "\<space>"
+
+syntax on
+filetype plugin indent on
+
+set number
+set hidden
+set title
+set ruler
+set backspace=indent,eol,start
+set autoindent
+set smartindent
+set expandtab
+set tabstop=2
+set shiftwidth=2
+set shiftround
+set matchpairs+=<:>
+set fileencoding=utf-8
+set incsearch hlsearch ignorecase smartcase
+set wildmenu
+
+inoremap <C-j> <Down>
+inoremap <C-k> <Up>
+inoremap <C-l> <Right>
+inoremap <silent> <C-h> <C-g>u<C-h>
+inoremap <silent> <C-d> <Del>
