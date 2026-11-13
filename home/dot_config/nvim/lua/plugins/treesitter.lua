@@ -1,9 +1,27 @@
 -- Syntax highlighting and indentation with treesitter (main branch API).
 -- Parsers are compiled with the tree-sitter CLI from mise and a C compiler.
 local parsers = {
-  "bash", "diff", "dockerfile", "gitcommit", "go", "hcl", "javascript", "json",
-  "lua", "markdown", "markdown_inline", "python", "ruby", "rust", "terraform",
-  "toml", "tsx", "typescript", "vim", "vimdoc", "yaml",
+  "bash",
+  "diff",
+  "dockerfile",
+  "gitcommit",
+  "go",
+  "hcl",
+  "javascript",
+  "json",
+  "lua",
+  "markdown",
+  "markdown_inline",
+  "python",
+  "ruby",
+  "rust",
+  "terraform",
+  "toml",
+  "tsx",
+  "typescript",
+  "vim",
+  "vimdoc",
+  "yaml",
 }
 
 return {

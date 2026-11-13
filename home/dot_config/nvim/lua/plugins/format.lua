@@ -14,7 +14,7 @@ return {
   opts = {
     formatters_by_ft = {
       lua = { "stylua" }, -- installed by mise
-      sh = { "shfmt" },   -- installed by mise
+      sh = { "shfmt" }, -- installed by mise
       bash = { "shfmt" },
     },
     format_on_save = { timeout_ms = 1000, lsp_format = "fallback" },
