@@ -18,5 +18,8 @@ stylua = "latest"
 shfmt = "latest"
 shellcheck = "latest"
 
-# CLI tools that apt does not ship
+# CLI tools that apt does not ship, or ships too old
 ghq = "latest"
+# Ctrl-G (ghql). Debian's peco 0.5.10 prints raw terminfo strings ("%p1%dG")
+# and garbles its prompt in iTerm over SSH; upstream 0.6.0 does not.
+peco = "0.6.0"
