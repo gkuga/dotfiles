@@ -14,11 +14,7 @@ packages_darwin() {
     die "re-run install.sh after the Command Line Tools installation finishes"
   fi
 
-  if ! has brew; then
-    for prefix in /opt/homebrew /usr/local; do
-      [ -x "$prefix/bin/brew" ] && eval "$("$prefix/bin/brew" shellenv)" && break
-    done
-  fi
+  # lib.sh already put an existing Homebrew on PATH.
   if ! has brew; then
     log "installing Homebrew"
     run_installer /bin/bash https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
