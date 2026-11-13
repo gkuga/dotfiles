@@ -12,23 +12,27 @@ of `install.sh`).
 > deletes or renames those files. Do **not** `git pull` until step 4: an early
 > pull leaves the links dangling.
 >
-> Terminals that are already open keep working during the migration, because a
-> running shell does not re-read its rc files. Do the whole migration in one
-> terminal, and do not open new ones until step 5 is done.
+> Do steps 1–5 in **one terminal** and do not open new ones until step 5 is
+> done. A running shell does not re-read its rc files, so this terminal keeps
+> working. A new terminal after step 4 starts zsh without any rc file and may
+> show zsh's first-run menu ("This is the Z Shell configuration function for
+> new users"): press `q` so that it writes nothing.
 
 Most of the time goes into `brew bundle` and `mise install`.
 
 ## 1. Back up and check
 
 ```sh
-backup=~/dotfiles-backup-$(date +%Y%m%d)
-mkdir -p "$backup"
-cp -p ~/.gitconfig ~/.tool-versions "$backup"/
+backup=~/dotfiles-backup        # used again in step 6 and in "Rolling back"
+mkdir "$backup"                 # fails if an older backup is still there: move it away first
+cp -p ~/.gitconfig ~/.tool-versions ~/.claude/CLAUDE.md "$backup"/
 cp -p ~/.config/git/ignore "$backup"/git-ignore
 cp -p ~/.gnupg/gpg-agent.conf "$backup"/
 
-# Record the current symlinks (used by "Rolling back" below)
-find ~ -maxdepth 1 -type l -lname '*gkuga/dotfiles*' -exec ls -l {} \; > "$backup"/symlinks.txt
+# The current symlinks as "LINK TARGET" lines (used by "Rolling back")
+find ~ -maxdepth 1 -type l -lname '*gkuga/dotfiles*' | while read -r l; do
+  printf '%s %s\n' "$l" "$(readlink "$l")"
+done > "$backup"/symlinks.txt
 cat "$backup"/symlinks.txt
 ```
 
@@ -49,6 +53,15 @@ brew bundle --file=/tmp/Brewfile
 
 This adds bash 5, bash-completion@2, tmux, chezmoi, mise and the rest. Nothing
 in `$HOME` changes yet.
+
+A cask fails with "It seems there is already an App at ..." when the app was
+installed without Homebrew (here: Docker Desktop). Let Homebrew take over the
+existing app, then run `brew bundle` again:
+
+```sh
+brew install --cask --adopt docker
+brew bundle --file=/tmp/Brewfile
+```
 
 ## 3. Move the work-specific git settings out of `~/.gitconfig`
 
@@ -85,9 +98,10 @@ git switch master
 git pull --ff-only
 ```
 
-Do not delete the old links' targets by hand. `~/.profile.d` was a symlink, so
-it is gone now, and step 5 creates it again with only the new files. Copying the
-old directory would keep `99-asdf.sh`, which puts asdf ahead of mise on `PATH`.
+Do not copy the old links' targets into place. `~/.profile.d` was a symlink, so
+it is gone now, and step 5 creates it again with only the new files. A copy of
+the old directory would keep `99-asdf.sh`, which puts asdf ahead of mise on
+`PATH`.
 
 ## 5. Apply the dotfiles
 
@@ -114,17 +128,17 @@ Read the diff before you confirm. Expected changes:
 - `~/.claude/CLAUDE.md` and `~/.gnupg/gpg-agent.conf`: no change
 - `~/.claude/settings.json` is only created when missing, so yours is kept
 
-Check it in a **new** terminal (the login shell is still zsh, so start bash):
+Then start bash in the same terminal (the login shell is still zsh):
 
 ```sh
 /opt/homebrew/bin/bash -l
-echo "$PATH" | tr : '\n' | head -5   # mise shims, ~/.local/bin, Homebrew first
+command -v bash git                  # /opt/homebrew/bin/...
 git config --get-regexp '^url\.'     # comes from ~/.gitconfig.local
 cd ~/dev/src/github.com/gkuga/dotfiles
 ```
 
-Work in this bash for the rest of the migration: the old zsh terminal still has
-the asdf `PATH`.
+The mise shims are not on `PATH` yet: that directory only exists after step 6.
+Work in this bash from now on; the zsh around it still has the asdf `PATH`.
 
 ## 6. Move from asdf to mise
 
@@ -133,8 +147,9 @@ need changes. Only the global versions move to
 `~/.config/mise/config.toml`.
 
 ```sh
-mv ~/.tool-versions ~/dotfiles-backup-$(date +%Y%m%d)/tool-versions.global
+mv ~/.tool-versions ~/dotfiles-backup/tool-versions.global
 ./install.sh --only mise      # mise install for the global tools, Claude Code CLI
+exec bash -l                  # now with the mise shims on PATH
 ```
 
 > [!NOTE]
@@ -146,7 +161,8 @@ Then install the tools of each project:
 
 ```sh
 ghq list -p | while read -r dir; do
-  [ -f "$dir/.tool-versions" ] && (cd "$dir" && echo "== $dir" && mise install)
+  # </dev/null: an installer that reads stdin must not eat the directory list
+  [ -f "$dir/.tool-versions" ] && (cd "$dir" && echo "== $dir" && mise install </dev/null)
 done
 ```
 
@@ -173,39 +189,61 @@ Open a new terminal and check that `echo $BASH_VERSION` prints `5.x`. Then:
 - Terminal app: turn on "Use Option as Meta key" for the Neovim `<M-...>` keys.
 - Neovim: start `nvim` once (plugins install from `lazy-lock.json`), then
   `:Copilot auth`. Run `claude` once to log in.
-- Port what you still need from the old zsh setup into `~/.bashrc.local`:
+- Completions the zsh setup had: put them where bash-completion loads them on
+  first use, so that they cost nothing at shell start:
 
   ```sh
-  # Docker CLI completion (Docker Desktop)
-  for f in /Applications/Docker.app/Contents/Resources/etc/docker{,-compose}.bash-completion; do
-    [ -r "$f" ] && . "$f"
-  done
-  # cargo completion (after mise installed rust)
-  command -v rustup >/dev/null && . <(rustup completions bash cargo)
+  dir=~/.local/share/bash-completion/completions
+  mkdir -p "$dir"
+  etc=/Applications/Docker.app/Contents/Resources/etc
+  ln -sf "$etc/docker.bash-completion" "$dir/docker"
+  ln -sf "$etc/docker-compose.bash-completion" "$dir/docker-compose"
+  rustup completions bash cargo > "$dir/cargo"   # rust from mise comes with rustup
   ```
+
+  Anything else that only this Mac needs goes to `~/.bashrc.local`.
 
 - Once everything has worked for a few days:
 
   ```sh
   brew uninstall asdf
   rm -rf ~/.asdf                      # about 14 GB here
-  git -C ~/dev/src/github.com/gkuga/dotfiles stash list   # drop the stash when unneeded
+  git -C ~/dev/src/github.com/gkuga/dotfiles stash list   # drop "pre-chezmoi local changes" when unneeded
+  rm -rf ~/dotfiles-backup
   ```
 
 ## Rolling back
 
-The new Homebrew packages, mise tools and the Claude Code CLI can stay; they
-do not get in the way of the old setup. As long as `~/.asdf` still exists, this
-restores the old dotfiles:
+This restores the old dotfiles while `~/.asdf` and `~/dotfiles-backup` still
+exist. The new Homebrew packages, mise tools and the Claude Code CLI can stay;
+the old setup ignores them. Run it from bash, with the checkout still on
+`master`: chezmoi needs the new source to list the files it manages.
 
 ```sh
 cd ~/dev/src/github.com/gkuga/dotfiles
+backup=~/dotfiles-backup
+
+# 1. Remove every file chezmoi created (your ~/.claude/settings.json stays),
+#    then the directories that are empty now.
+chezmoi managed --path-style absolute --include files,symlinks |
+  grep -vxF "$HOME/.claude/settings.json" |
+  while read -r f; do rm -f "$f"; done
+chezmoi managed --path-style absolute --include dirs | sort -r |
+  while read -r d; do rmdir "$d" 2>/dev/null; done
+
+# 2. The old checkout and its local changes (looked up by name, not the top stash)
 git switch --detach 13645d5          # last commit of the symlink setup
-git stash pop                        # the old local changes
-# Recreate the links listed in the backup's symlinks.txt, e.g.
-ln -sfn ~/dev/src/github.com/gkuga/dotfiles/zshrc ~/.zshrc
-mv ~/dotfiles-backup-*/tool-versions.global ~/.tool-versions
-cp ~/dotfiles-backup-*/.gitconfig ~/.gitconfig
+stash=$(git stash list | grep -m1 'pre-chezmoi local changes' | cut -d: -f1)
+git stash pop "$stash"
+
+# 3. The old symlinks and files
+while read -r link target; do ln -sfn "$target" "$link"; done < "$backup"/symlinks.txt
+cp -p "$backup"/.gitconfig ~/.gitconfig
+mkdir -p ~/.claude ~/.config/git
+cp -p "$backup"/CLAUDE.md ~/.claude/CLAUDE.md
+cp -p "$backup"/git-ignore ~/.config/git/ignore
+cp -p "$backup"/gpg-agent.conf ~/.gnupg/gpg-agent.conf
+mv "$backup"/tool-versions.global ~/.tool-versions 2>/dev/null || cp -p "$backup"/.tool-versions ~/.tool-versions
 ```
 
 After step 7, also run `chsh -s /bin/zsh`.
