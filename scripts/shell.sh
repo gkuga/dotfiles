@@ -37,9 +37,11 @@ if ! grep -qx "$target" /etc/shells; then
   fi
 fi
 
+# Plain `chsh` asks for the user's password through PAM and fails without a
+# terminal; through sudo it does not, and sudo is needed above anyway.
 if [ "${DRY_RUN:-0}" = 1 ]; then
-  run chsh -s "$target"
+  as_root chsh -s "$target" "$(id -un)"
   exit 0
 fi
 confirm "change login shell from $current to $target?" || { warn "login shell unchanged"; exit 0; }
-run chsh -s "$target"
+as_root chsh -s "$target" "$(id -un)"
