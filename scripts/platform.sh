@@ -30,15 +30,33 @@ install_root_file() {
   return 0
 }
 
+# Reads an INI file on stdin and prints it with KEY=VALUE set in [SECTION].
+# Everything else (other keys, sections, comments) is kept as it is.
+ini_set() {
+  awk -v sec="$1" -v key="$2" -v val="$3" '
+    function emit() { if (insec && !done) { print key "=" val; done = 1 } }
+    /^[[:space:]]*\[/ {
+      emit()
+      line = $0; gsub(/[[:space:]]/, "", line)
+      insec = (line == "[" sec "]")
+      print; next
+    }
+    insec {
+      k = $0; sub(/=.*/, "", k); gsub(/[[:space:]]/, "", k)
+      if (k == key && index($0, "=")) { if (!done) { print key "=" val; done = 1 }; next }
+    }
+    { print }
+    END { emit(); if (!done) { if (NR) print ""; print "[" sec "]"; print key "=" val } }
+  '
+}
+
 platform_wsl() {
-  install_root_file /etc/wsl.conf "[boot]
-systemd=true
-
-[user]
-default=$(id -un)
-
-[interop]
-appendWindowsPath=true"
+  local conf
+  conf="$(cat /etc/wsl.conf 2>/dev/null || true)"
+  conf="$(printf '%s' "$conf" | ini_set boot systemd true)"
+  conf="$(printf '%s' "$conf" | ini_set user default "$(id -un)")"
+  conf="$(printf '%s' "$conf" | ini_set interop appendWindowsPath true)"
+  install_root_file /etc/wsl.conf "$conf"
   log "if /etc/wsl.conf changed, run 'wsl --shutdown' from Windows to apply it"
 
   if ! has docker; then
@@ -53,8 +71,20 @@ platform_linux() {
   fi
   # shellcheck disable=SC1091
   . /etc/os-release
-  local distro="${ID:-debian}" codename="${VERSION_CODENAME:-}"
-  [ -n "$codename" ] || die "cannot detect the distribution codename"
+  # download.docker.com only knows debian and ubuntu; derivatives (Mint,
+  # Pop!_OS, ...) use the repository of the distribution they are based on.
+  local distro="" codename=""
+  case "${ID:-}" in
+    debian|ubuntu) distro="$ID" codename="${VERSION_CODENAME:-}" ;;
+    *)
+      case " ${ID_LIKE:-} " in
+        *" ubuntu "*) distro=ubuntu codename="${UBUNTU_CODENAME:-}" ;;
+        *" debian "*) distro=debian codename="${DEBIAN_CODENAME:-}" ;;
+      esac
+      ;;
+  esac
+  [ -n "$distro" ] && [ -n "$codename" ] ||
+    die "cannot map ${ID:-this distribution} to a download.docker.com repository; install Docker Engine manually"
   confirm "install Docker Engine from download.docker.com ($distro $codename)?" || {
     warn "skipped Docker Engine"
     return 0
