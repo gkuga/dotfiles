@@ -25,6 +25,7 @@ run_installer() {
   local shell="$1" url="$2" script
   shift 2
   if [ "${DRY_RUN:-0}" = 1 ]; then
+    # shellcheck disable=SC2016 # print the command literally
     printf '\033[2m[dry-run]\033[0m %s -c "$(curl -fsSL %s)" -- %s\n' "$shell" "$url" "$*" >&2
     return 0
   fi

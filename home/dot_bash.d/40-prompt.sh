@@ -14,8 +14,11 @@ for f in \
 done
 unset f
 
+# shellcheck disable=SC2034 # read by git-prompt.sh
 GIT_PS1_SHOWDIRTYSTATE=1
+# shellcheck disable=SC2034
 GIT_PS1_SHOWUNTRACKEDFILES=1
+# shellcheck disable=SC2034
 GIT_PS1_SHOWUPSTREAM=auto
 
 __prompt_command() {

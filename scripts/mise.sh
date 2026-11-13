@@ -17,7 +17,7 @@ if ! has mise; then
 fi
 
 if [ ! -f "$HOME/.config/mise/config.toml" ]; then
-  warn "~/.config/mise/config.toml not found; run the dotfiles step first"
+  warn "$HOME/.config/mise/config.toml not found; run the dotfiles step first"
   exit 0
 fi
 

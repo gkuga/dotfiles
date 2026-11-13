@@ -2,6 +2,7 @@
 # scripts). Keep it POSIX sh, fast, and silent: never print anything here.
 
 # Prepend a directory to PATH if it exists and is not already there.
+# shellcheck disable=SC2329 # used by ~/.profile.d/*.sh
 path_prepend() {
   case ":$PATH:" in
     *":$1:"*) ;;

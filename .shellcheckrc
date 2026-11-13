@@ -1,0 +1,6 @@
+# Follow `# shellcheck source=...` directives relative to each script.
+source-path=SCRIPTDIR
+external-sources=true
+# The dotfiles source files chosen at runtime (~/.bash.d/*, ~/.profile.d/*,
+# completions), which shellcheck cannot follow.
+disable=SC1090,SC1091
