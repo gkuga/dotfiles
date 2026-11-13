@@ -35,7 +35,7 @@ Steps run in this order; each one is idempotent:
 | `packages` | Xcode CLT, Homebrew, `brew bundle` | apt: `apt-common.txt` + `apt-wsl.txt` | apt: `apt-common.txt` + `apt-linux.txt` |
 | `dotfiles` | install chezmoi, show the diff, apply after confirmation | same | same |
 | `mise` | install mise, `mise install` | same | same |
-| `platform` | - | `/etc/wsl.conf` (systemd, default user) | Docker Engine |
+| `platform` | warn if Docker Desktop is missing | `/etc/wsl.conf` (systemd, default user) | Docker Engine |
 | `shell` | Homebrew bash as login shell | already bash 5 | already bash 5 |
 
 On the first `chezmoi init` you are asked for git name/email and GPG signing
