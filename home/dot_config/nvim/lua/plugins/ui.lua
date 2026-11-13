@@ -13,6 +13,7 @@ return {
     event = "VeryLazy",
     opts = {
       spec = {
+        { "<leader>a", group = "ai / claude" },
         { "<leader>c", group = "code" },
         { "<leader>d", group = "lsp / diagnostics" },
         { "<leader>f", group = "find" },

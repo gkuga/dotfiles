@@ -52,6 +52,27 @@ Kept out of this public repository on purpose:
 - `~/.gitconfig.local`: work `url.insteadOf`, credential helpers, ...
 - `~/.bashrc.local`: anything else for one machine
 
+## AI in Neovim
+
+Once per machine: `claude` (log in to Claude Code) and `:Copilot auth` in Neovim.
+
+| Key | Mode | Action |
+|---|---|---|
+| `<Tab>` | insert | accept the Copilot suggestion (otherwise snippet jump / tab) |
+| `<M-w>` / `<M-]>` / `<M-[>` / `<C-]>` | insert | accept a word / next / previous / dismiss |
+| `<leader>ac` / `<leader>af` | normal | toggle / focus the Claude Code terminal |
+| `<leader>ar` / `<leader>aC` | normal | start Claude with `--resume` / `--continue` |
+| `<leader>am` | normal | select the Claude model |
+| `<leader>as` | visual / oil | send the selection / add the file under the cursor |
+| `<leader>ab` | normal | add the current buffer to Claude's context |
+| `<leader>aa` / `<leader>ad` | normal | accept / deny Claude's proposed diff |
+| `<C-q>` | Claude terminal | leave terminal mode (then `<C-w>h` etc. to move) |
+
+While a suggestion is shown, `<Tab>` accepts it: press `<C-]>` first to insert
+a real tab. `<M-...>` keys need "Use Option as Meta" in the macOS terminal
+settings. Neovim starts the Claude Code IDE server on startup, so `claude` in
+another tmux pane can connect with `/ide`.
+
 ## Day-to-day
 
 ```sh

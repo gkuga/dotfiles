@@ -5,9 +5,7 @@ return {
   opts = {
     on_attach = function(bufnr)
       local gs = require("gitsigns")
-      local function map(mode, lhs, rhs, desc)
-        vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
-      end
+      local function map(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc }) end
       map("n", "]h", function() gs.nav_hunk("next") end, "Next hunk")
       map("n", "[h", function() gs.nav_hunk("prev") end, "Previous hunk")
       map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")

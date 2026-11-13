@@ -40,9 +40,7 @@ return {
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("user_lsp_keymaps", { clear = true }),
         callback = function(ev)
-          local function map(lhs, rhs, desc)
-            vim.keymap.set("n", lhs, rhs, { buffer = ev.buf, desc = desc })
-          end
+          local function map(lhs, rhs, desc) vim.keymap.set("n", lhs, rhs, { buffer = ev.buf, desc = desc }) end
           -- Same keys as the old vim-lsp mappings (duplicates resolved).
           map("<leader>dd", vim.lsp.buf.definition, "Definition")
           map("<leader>df", vim.lsp.buf.references, "References")
@@ -51,9 +49,11 @@ return {
           map("<leader>dh", vim.lsp.buf.hover, "Hover")
           map("<leader>dn", function() vim.diagnostic.jump({ count = 1, float = true }) end, "Next diagnostic")
           map("<leader>dpr", function() vim.diagnostic.jump({ count = -1, float = true }) end, "Previous diagnostic")
-          map("<leader>ds", function()
-            vim.lsp.stop_client(vim.lsp.get_clients({ bufnr = ev.buf }))
-          end, "Stop LSP clients")
+          map(
+            "<leader>ds",
+            function() vim.lsp.stop_client(vim.lsp.get_clients({ bufnr = ev.buf })) end,
+            "Stop LSP clients"
+          )
         end,
       })
     end,
