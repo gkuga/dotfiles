@@ -16,8 +16,15 @@ else
 fi
 path_prepend "$HOMEBREW_PREFIX/sbin"
 path_prepend "$HOMEBREW_PREFIX/bin"
-export MANPATH="$HOMEBREW_PREFIX/share/man${MANPATH+:$MANPATH}:"
-export INFOPATH="$HOMEBREW_PREFIX/share/info:${INFOPATH:-}"
+# Same as `brew shellenv`, but without growing on every nested login shell.
+case ":${MANPATH:-}:" in
+  *":$HOMEBREW_PREFIX/share/man:"*) ;;
+  *) export MANPATH="$HOMEBREW_PREFIX/share/man${MANPATH+:$MANPATH}:" ;;
+esac
+case ":${INFOPATH:-}:" in
+  *":$HOMEBREW_PREFIX/share/info:"*) ;;
+  *) export INFOPATH="$HOMEBREW_PREFIX/share/info:${INFOPATH:-}" ;;
+esac
 
 # Prefer GNU tools and keg-only formulae when they are installed.
 for d in \
@@ -31,4 +38,4 @@ for d in \
 done
 unset d
 # binutils shadows the macOS toolchain, so append it instead.
-[ -d "$HOMEBREW_PREFIX/opt/binutils/bin" ] && PATH="$PATH:$HOMEBREW_PREFIX/opt/binutils/bin"
+path_append "$HOMEBREW_PREFIX/opt/binutils/bin"

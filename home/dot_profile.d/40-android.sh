@@ -2,4 +2,5 @@
 
 export ANDROID_HOME="$HOME/lib/android-sdk"
 export ANDROID_SDK_ROOT="$ANDROID_HOME" # Flutter
-PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
+path_append "$ANDROID_HOME/cmdline-tools/latest/bin"
+path_append "$ANDROID_HOME/platform-tools"
