@@ -8,10 +8,6 @@
 {{- if $gpgsign -}}
 {{-   $signingkey = promptStringOnce . "signingkey" "GPG signing key ID (leave empty for the default key)" "" -}}
 {{- end -}}
-{{- $wsl := false -}}
-{{- if eq .chezmoi.os "linux" -}}
-{{-   $wsl = .chezmoi.kernel.osrelease | lower | contains "microsoft" -}}
-{{- end -}}
 # The repository root (it holds .chezmoiroot), so that plain `chezmoi diff`
 # and `chezmoi apply` work without --source.
 sourceDir = {{ .chezmoi.workingTree | quote }}
@@ -21,4 +17,3 @@ sourceDir = {{ .chezmoi.workingTree | quote }}
   email = {{ $email | quote }}
   gpgsign = {{ $gpgsign }}
   signingkey = {{ $signingkey | quote }}
-  wsl = {{ $wsl }}
