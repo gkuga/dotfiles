@@ -2,3 +2,10 @@
 
 # wslview (open URLs/files with Windows apps); skipped if not in the repositories
 wslu
+
+# mDNS (*.local names). WSL's DNS tunneling forwards only DNS, not the mDNS
+# answers Windows gets, so resolve them in Linux: libnss-mdns adds
+# mdns4_minimal to /etc/nsswitch.conf and needs avahi-daemon. Works with
+# networkingMode=mirrored, where WSL ships Hyper-V firewall rules for mDNS.
+avahi-daemon
+libnss-mdns
