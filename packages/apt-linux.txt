@@ -1,0 +1,5 @@
+# Linux hosts only (not WSL). Docker Engine is installed by scripts/platform.sh.
+
+# Clipboard for tmux / neovim
+xclip
+wl-clipboard

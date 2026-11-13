@@ -1,0 +1,49 @@
+# Packages for every Debian-based Linux (WSL and hosts).
+# Language runtimes, neovim and tools missing from apt (ghq, ...) come from mise.
+
+# Base
+ca-certificates
+curl
+wget
+unzip
+zip
+locales
+bash-completion
+man-db
+less
+
+# Shell and terminal
+tmux
+screen
+
+# CLI
+git
+git-lfs
+gh
+peco
+fzf
+ripgrep
+fd-find
+jq
+tree
+vim
+
+# GPG commit signing
+gnupg
+pinentry-curses
+
+# Build dependencies (C compiler for treesitter, ruby/python builds by mise)
+build-essential
+pkg-config
+autoconf
+bison
+libssl-dev
+libyaml-dev
+libreadline-dev
+zlib1g-dev
+libffi-dev
+libgdbm-dev
+libbz2-dev
+libsqlite3-dev
+liblzma-dev
+uuid-dev
