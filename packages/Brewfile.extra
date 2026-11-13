@@ -47,6 +47,10 @@ brew "composer"
 brew "ffmpeg"
 brew "heroku"
 brew "asyncapi"
+# Android SDK for Flutter (`flutter config --android-sdk` points to its
+# $HOMEBREW_PREFIX/share/android-commandlinetools; ANDROID_HOME is set by
+# ~/.profile.d/40-android.sh)
+cask "android-commandlinetools"
 
 # Network
 brew "unbound"
