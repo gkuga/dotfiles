@@ -4,7 +4,8 @@
 [tools]
 go = "1.24.4"
 node = "20.19.6"
-python = "3.12.5"
+# 3.12.5 builds have no GitHub artifact attestations, so mise refuses them.
+python = "3.12.16"
 ruby = "3.3.4"
 rust = "1.96.0"
 terraform = "1.9.3"
