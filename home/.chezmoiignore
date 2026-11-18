@@ -1,0 +1,4 @@
+{{- /* ~/.codex only where Codex is used (its command exists or it already created ~/.codex). */ -}}
+{{- if and (not (lookPath "codex")) (not (stat (joinPath .chezmoi.homeDir ".codex"))) }}
+.codex
+{{- end }}

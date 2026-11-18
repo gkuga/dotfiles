@@ -1,9 +1,10 @@
 # Global rules for coding agents
 
-Shared by every coding agent on this machine: Claude Code imports this file
-from `~/.claude/CLAUDE.md`, and `~/.codex/AGENTS.md` is a symlink to it.
-Managed by chezmoi (`home/dot_config/agents/AGENTS.md` in the dotfiles
-repository); edit it there, not here.
+<!--
+Shared by the coding agents on this machine: ~/.claude/CLAUDE.md imports it,
+and ~/.codex/AGENTS.md is generated from it by chezmoi. The source is
+home/dot_config/agents/AGENTS.md in the dotfiles repository.
+-->
 
 ## Git commits
 
