@@ -34,8 +34,8 @@ instanceIdleTimeout=-1
 
 `instanceIdleTimeout=-1` keeps the distro running when no Windows terminal has
 it open, so SSH into WSL does not stop working after a while. The `platform`
-step also sets `defaultVhdSize=128GB` and, only when it is not set yet,
-`memory=12GB` (adjust it to the PC's RAM).
+step also sets `defaultVhdSize=128GB` when no value is set. It leaves `memory`
+alone: set a limit that fits the PC's RAM yourself, if you want one.
 
 > [!WARNING]
 > `wsl --shutdown`, `wsl --unregister` and `reboot` inside WSL stop the distro,
@@ -184,8 +184,8 @@ GitHub's ED25519 host key fingerprint is
 - Docker: enable this distro under Docker Desktop's Settings > Resources > WSL
   integration on Windows. Docker is not installed inside WSL.
 - `/etc/wsl.conf` (`[user] default=`, `[interop] appendWindowsPath=true`) and
-  `.wslconfig` (`networkingMode`, `instanceIdleTimeout`, `defaultVhdSize`, and
-  `memory` when missing; merged into the existing file):
+  `.wslconfig` (`networkingMode`, `instanceIdleTimeout`, and `defaultVhdSize`
+  when missing; merged into the existing file, line endings kept):
   `./install.sh --only platform` at the console, then `wsl --shutdown`.
 
 ## Windows from WSL
