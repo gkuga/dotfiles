@@ -19,13 +19,23 @@ wsl --install -d Debian
 Create the Linux user when the distro first starts.
 
 Mirrored networking lets WSL share the Windows IP address, so other machines
-on the LAN reach WSL directly and mDNS works. Add this to
+on the LAN reach WSL directly and mDNS works. The `platform` step of
+`install.sh` (step 5) sets it, but remote access over SSH needs it from the
+start, so on a new PC add it by hand first: put this in
 `%USERPROFILE%\.wslconfig`, then run `wsl --shutdown` and start the distro again:
 
 ```ini
 [wsl2]
 networkingMode=mirrored
+
+[general]
+instanceIdleTimeout=-1
 ```
+
+`instanceIdleTimeout=-1` keeps the distro running when no Windows terminal has
+it open, so SSH into WSL does not stop working after a while. The `platform`
+step also sets `defaultVhdSize=128GB` and, only when it is not set yet,
+`memory=12GB` (adjust it to the PC's RAM).
 
 > [!WARNING]
 > `wsl --shutdown`, `wsl --unregister` and `reboot` inside WSL stop the distro,
@@ -125,10 +135,10 @@ cd ~/dev/src/github.com/gkuga/dotfiles && ./install.sh
 | Sign git commits with GPG | Enter (`true`) |
 | GPG signing key ID | `<keyid>` |
 | apply these dotfile changes? | `y` after reading the diff |
-| write /etc/wsl.conf? | `y` only at the console; it takes effect after `wsl --shutdown` |
+| write /etc/wsl.conf? / write .../.wslconfig? | `y`; both take effect after `wsl --shutdown`, which you run only at the console |
 
 Unattended over SSH (needs the passwordless sudo from step 2): write the answers
-first, then skip the `platform` step, which edits `/etc/wsl.conf`:
+first, then skip the `platform` step, which edits `/etc/wsl.conf` and `.wslconfig`:
 
 ```sh
 mkdir -p ~/.config/chezmoi
@@ -173,7 +183,9 @@ GitHub's ED25519 host key fingerprint is
 - `claude`: log in to Claude Code.
 - Docker: enable this distro under Docker Desktop's Settings > Resources > WSL
   integration on Windows. Docker is not installed inside WSL.
-- `/etc/wsl.conf` (`[user] default=`, `[interop] appendWindowsPath=true`):
+- `/etc/wsl.conf` (`[user] default=`, `[interop] appendWindowsPath=true`) and
+  `.wslconfig` (`networkingMode`, `instanceIdleTimeout`, `defaultVhdSize`, and
+  `memory` when missing; merged into the existing file):
   `./install.sh --only platform` at the console, then `wsl --shutdown`.
 
 ## Windows from WSL
