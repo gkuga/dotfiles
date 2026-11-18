@@ -47,6 +47,10 @@ echo '<your ssh public key>' >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 ```
 
+If `systemd=true` is missing, sshd and avahi will not start as services: add
+`[boot]` / `systemd=true` to `/etc/wsl.conf`, run `wsl --shutdown` in Windows,
+start the distro again, and check `ps -p 1 -o comm=` prints `systemd`.
+
 `avahi-daemon` and `libnss-mdns` make `<windows-hostname>.local` resolvable on
 the LAN (they are also in `packages/apt-wsl.txt`). WSL's DNS tunneling does not
 pass on the mDNS answers that Windows gets, so Linux has to speak mDNS itself.
@@ -55,9 +59,9 @@ WSL ships the Hyper-V firewall rules that allow it.
 Optional, to let the setup run unattended over SSH:
 
 ```sh
-echo "$(id -un) ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$(id -un) >/dev/null
-sudo chmod 440 /etc/sudoers.d/$(id -un)
-sudo visudo -c -f /etc/sudoers.d/$(id -un)
+f=/etc/sudoers.d/nopasswd-$(id -un | tr . _)   # sudo ignores file names with a dot
+echo "$(id -un) ALL=(ALL) NOPASSWD:ALL" | sudo tee "$f" >/dev/null
+sudo chmod 440 "$f" && sudo visudo -c -f "$f"
 ```
 
 On `<old>`, add an alias to `~/.ssh/config`, with `ProxyJump` when the LAN is
@@ -87,11 +91,16 @@ jump hosts only relay it.
 
 ```sh
 scp ~/.ssh/id_ed25519 ~/.ssh/id_ed25519.pub ~/.ssh/config <new>:.ssh/
-scp ~/.ssh/<other-keys>.pem <new>:.ssh/           # keys that ~/.ssh/config refers to
-ssh <new> 'chmod 600 ~/.ssh/id_ed25519 ~/.ssh/config ~/.ssh/*.pem'
+ssh <new> 'chmod 600 ~/.ssh/id_ed25519 ~/.ssh/config'
 scp ~/.gitconfig.local <new>:
 gpg --export-secret-keys --armor <keyid> | ssh <new> 'gpg --batch --import'
 gpg --export-ownertrust | ssh <new> 'gpg --import-ownertrust'
+```
+
+Other keys that `~/.ssh/config` refers to (only if there are any):
+
+```sh
+scp ~/.ssh/<key>.pem <new>:.ssh/ && ssh <new> 'chmod 600 ~/.ssh/<key>.pem'
 ```
 
 Exporting the GPG key asks for its passphrase on `<old>`. `gpg` on `<new>`
@@ -130,11 +139,19 @@ cat > ~/.config/chezmoi/chezmoi.toml <<'EOF'
   gpgsign = true
   signingkey = "<keyid>"
 EOF
-./install.sh --yes --only dotfiles,mise,shell > /tmp/install.log 2>&1
+cd ~/dev/src/github.com/gkuga/dotfiles
+nohup setsid ./install.sh --yes --only dotfiles,mise,shell > /tmp/install.log 2>&1 < /dev/null &
+tail -f /tmp/install.log            # Ctrl-C stops only tail
 ```
 
-`chezmoi init` keeps those answers and adds `sourceDir`. Redirecting the output
-to a file keeps the install running if the SSH connection drops.
+`chezmoi init` keeps those answers and adds `sourceDir`. `nohup setsid` keeps the
+install running when the SSH connection drops; reconnect and read the log.
+
+If the log stops moving during a download (seen after a network hiccup: the
+`curl` fetching the Claude Code CLI waited forever), find it with
+`pgrep -af curl`, `kill` it, wait for `install.sh` to exit, and run
+`./install.sh --yes --only mise,shell` again the same way. Every step can be
+re-run.
 
 Check in a new login shell (`exec bash -l` on its own line first):
 

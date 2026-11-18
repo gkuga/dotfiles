@@ -48,8 +48,13 @@ Answers for `chezmoi init`:
 |---|---|
 | Git user.name | Enter (the default) |
 | Git user.email | `<email>`; do not leave it empty |
-| Sign git commits with GPG | Enter (`true`); import the key in step 3 |
-| GPG signing key ID | `<keyid>` |
+| Sign git commits with GPG | Enter (`true`) if you will import an existing key in step 3; `false` if you have no key yet |
+| GPG signing key ID | `<keyid>` (only asked when signing is on) |
+| apply these dotfile changes? [y/N] | `y` after reading the diff; Enter means No and stops install.sh |
+
+The answers are asked only once. To change them later, run `chezmoi edit-config`
+(for example to set `gpgsign = true` and `signingkey` after creating a key),
+then `chezmoi apply`.
 
 Notes on the packages step:
 
@@ -67,16 +72,24 @@ Notes on the packages step:
 
 ## 3. Keys and machine-specific settings
 
-From `<old>` (run on the new Mac):
+From `<old>`, run on the new Mac. The new Mac has no key yet, so this needs
+`<old>` to accept a password login. If it only accepts keys, turn on Remote Login
+on the new Mac (System Settings > General > Sharing) and push the same files from
+`<old>` instead, as in [setup-wsl.md](setup-wsl.md#4-copy-keys-and-machine-specific-settings-from-old).
 
 ```sh
 install -d -m 700 ~/.ssh
 scp <old>:.ssh/id_ed25519 <old>:.ssh/id_ed25519.pub <old>:.ssh/config ~/.ssh/
-scp '<old>:.ssh/*.pem' ~/.ssh/          # keys that ~/.ssh/config refers to
-chmod 600 ~/.ssh/id_ed25519 ~/.ssh/config ~/.ssh/*.pem
+chmod 600 ~/.ssh/id_ed25519 ~/.ssh/config
 scp <old>:.gitconfig.local ~/
 ssh <old> 'gpg --export-secret-keys --armor <keyid>' | gpg --import
 ssh <old> 'gpg --export-ownertrust' | gpg --import-ownertrust
+```
+
+Other keys that `~/.ssh/config` refers to (only if there are any):
+
+```sh
+scp '<old>:.ssh/<key>.pem' ~/.ssh/ && chmod 600 ~/.ssh/<key>.pem
 ```
 
 Exporting the GPG key asks for its passphrase on `<old>`; when that prompt
@@ -84,7 +97,7 @@ cannot reach you over SSH, export to a file on `<old>` instead and copy it.
 
 Without an old machine: create a key with `ssh-keygen -t ed25519` and
 `gpg --quick-generate-key "<name> <<email>>" ed25519 sign never`, and add both
-public keys to GitHub.
+public keys to GitHub. Then turn signing on with `chezmoi edit-config` (see step 2).
 
 ## 4. Projects
 
@@ -93,7 +106,8 @@ cloning them with `ghq get`:
 
 ```sh
 ghq list -p | while read -r dir; do
-  [ -f "$dir/.tool-versions" ] && (cd "$dir" && echo "== $dir" && mise install </dev/null)
+  [ -f "$dir/.tool-versions" ] || [ -f "$dir/mise.toml" ] || [ -f "$dir/.mise.toml" ] || continue
+  (cd "$dir" && echo "== $dir" && mise install </dev/null)
 done
 ```
 
@@ -127,10 +141,11 @@ Once, by hand:
   dir=~/.local/share/bash-completion/completions
   mkdir -p "$dir"
   etc=/Applications/Docker.app/Contents/Resources/etc
-  ln -sf "$etc/docker.bash-completion" "$dir/docker"
-  ln -sf "$etc/docker-compose.bash-completion" "$dir/docker-compose"
-  rustup completions bash cargo > "$dir/cargo"
-  pnpm completion bash > "$dir/pnpm"
+  for c in docker docker-compose; do
+    [ -r "$etc/$c.bash-completion" ] && ln -sf "$etc/$c.bash-completion" "$dir/$c"
+  done
+  command -v rustup >/dev/null && rustup completions bash cargo > "$dir/cargo"
+  command -v pnpm >/dev/null && pnpm completion bash > "$dir/pnpm"
   ```
 
 - Anything only this Mac needs goes to `~/.bashrc.local` or `~/.gitconfig.local`.
