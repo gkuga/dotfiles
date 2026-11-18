@@ -2,8 +2,8 @@
 # Platform-specific system setup that does not fit into a package list.
 #   darwin: Docker Desktop is installed by hand (it updates itself); warn if missing
 #   wsl:    /etc/wsl.conf (systemd, default user) and the Windows-side
-#           %USERPROFILE%\.wslconfig (mirrored networking); Docker comes from
-#           Docker Desktop
+#           %USERPROFILE%\.wslconfig (mirrored networking, no idle shutdown,
+#           ...); Docker comes from Docker Desktop
 #   linux:  Docker Engine from the official Docker apt repository
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -76,6 +76,15 @@ platform_darwin() {
   fi
 }
 
+# Succeeds when the INI file on stdin has KEY in [SECTION].
+ini_has() {
+  awk -v sec="$1" -v key="$2" '
+    /^[[:space:]]*\[/ { line = $0; gsub(/[[:space:]]/, "", line); insec = (line == "[" sec "]"); next }
+    insec { k = $0; sub(/=.*/, "", k); gsub(/[[:space:]]/, "", k); if (k == key && index($0, "=")) found = 1 }
+    END { exit !found }
+  '
+}
+
 # Prints the Windows user profile directory as a WSL path (/mnt/c/Users/...).
 # PowerShell is asked for UTF-8 so that non-ASCII user names survive.
 windows_profile() {
@@ -97,11 +106,21 @@ platform_wsl() {
   conf="$(printf '%s' "$conf" | ini_set interop appendWindowsPath true)"
   install_file /etc/wsl.conf "$conf" root
 
-  # Mirrored networking: WSL shares the Windows IP address, so other machines
-  # reach it directly and mDNS (*.local) works both ways.
+  # .wslconfig (Windows side, all distros):
+  #   networkingMode=mirrored   WSL shares the Windows IP address, so other
+  #                             machines reach it directly and mDNS works
+  #   instanceIdleTimeout=-1    keep the distro running when no session is
+  #                             open, so SSH into WSL keeps working
+  #   defaultVhdSize=128GB      virtual disk limit for newly created distros
+  #   memory                    machine-specific: 12GB only when not set yet
   if profile="$(windows_profile)" && [ -d "$profile" ]; then
     conf="$(read_text "$profile/.wslconfig")"
+    if ! printf '%s' "$conf" | ini_has wsl2 memory; then
+      conf="$(printf '%s' "$conf" | ini_set wsl2 memory 12GB)"
+    fi
     conf="$(printf '%s' "$conf" | ini_set wsl2 networkingMode mirrored)"
+    conf="$(printf '%s' "$conf" | ini_set wsl2 defaultVhdSize 128GB)"
+    conf="$(printf '%s' "$conf" | ini_set general instanceIdleTimeout -1)"
     install_file "$profile/.wslconfig" "$conf"
   else
     warn "Windows user profile not found: set networkingMode=mirrored under [wsl2]"

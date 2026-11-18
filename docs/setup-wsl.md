@@ -27,7 +27,15 @@ start, so on a new PC add it by hand first: put this in
 ```ini
 [wsl2]
 networkingMode=mirrored
+
+[general]
+instanceIdleTimeout=-1
 ```
+
+`instanceIdleTimeout=-1` keeps the distro running when no Windows terminal has
+it open, so SSH into WSL does not stop working after a while. The `platform`
+step also sets `defaultVhdSize=128GB` and, only when it is not set yet,
+`memory=12GB` (adjust it to the PC's RAM).
 
 > [!WARNING]
 > `wsl --shutdown`, `wsl --unregister` and `reboot` inside WSL stop the distro,
@@ -176,7 +184,8 @@ GitHub's ED25519 host key fingerprint is
 - Docker: enable this distro under Docker Desktop's Settings > Resources > WSL
   integration on Windows. Docker is not installed inside WSL.
 - `/etc/wsl.conf` (`[user] default=`, `[interop] appendWindowsPath=true`) and
-  `.wslconfig` (`networkingMode=mirrored`, merged into the existing file):
+  `.wslconfig` (`networkingMode`, `instanceIdleTimeout`, `defaultVhdSize`, and
+  `memory` when missing; merged into the existing file):
   `./install.sh --only platform` at the console, then `wsl --shutdown`.
 
 ## Windows from WSL
