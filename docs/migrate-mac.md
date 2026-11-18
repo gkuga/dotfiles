@@ -173,7 +173,8 @@ Read the diff before you confirm. Expected changes:
   `~/.config/nvim/`, `~/.config/mise/config.toml`
 - `~/.gitconfig`: the template, without your `insteadOf` (now in `.gitconfig.local`)
 - `~/.config/git/ignore`: adds `.DS_Store` and `*.swp`
-- `~/.claude/CLAUDE.md` and `~/.gnupg/gpg-agent.conf`: no change
+- `~/.claude/CLAUDE.md`: no change
+- `~/.gnupg/gpg-agent.conf`: only the passphrase cache times change (see the comment in it)
 - `~/.claude/settings.json` is only created when missing, so yours is kept
 
 Then start bash in the same terminal (the login shell is still zsh):

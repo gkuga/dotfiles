@@ -3,5 +3,13 @@ pinentry-program {{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/lo
 {{- else -}}
 pinentry-program /usr/bin/pinentry-curses
 {{- end }}
-default-cache-ttl 6000
-max-cache-ttl 72000
+# Passphrase cache: forget it after a day without use, and two weeks after it
+# was entered at the latest. While cached, any process running as this user can
+# sign with the key and decrypt data encrypted to it, without a prompt.
+# The cache lives in the agent's memory until the agent stops (macOS logout or
+# reboot, `wsl --shutdown`; closing terminals is not enough on WSL). To forget
+# it now: gpgconf --reload gpg-agent
+# On macOS, ticking "Save in Keychain" in pinentry-mac stores the passphrase in
+# the login keychain instead, where these limits do not apply.
+default-cache-ttl 86400
+max-cache-ttl 1209600
