@@ -210,7 +210,8 @@ Then install the tools of each project:
 ```sh
 ghq list -p | while read -r dir; do
   # </dev/null: an installer that reads stdin must not eat the directory list
-  [ -f "$dir/.tool-versions" ] && (cd "$dir" && echo "== $dir" && mise install </dev/null)
+  [ -f "$dir/.tool-versions" ] || [ -f "$dir/mise.toml" ] || [ -f "$dir/.mise.toml" ] || continue
+  (cd "$dir" && echo "== $dir" && mise install </dev/null)
 done
 ```
 
