@@ -52,6 +52,16 @@ chezmoi init --source . \
   --promptBool 'Sign git commits with GPG=false'
 ```
 
+## Rules for coding agents
+
+`~/.config/agents/AGENTS.md` (source: [home/dot_config/agents/AGENTS.md](home/dot_config/agents/AGENTS.md))
+holds the global rules for every coding agent: the language of commits, PRs and
+code comments, and cleaning up after a task. Claude Code reads it through an
+`@` import in `~/.claude/CLAUDE.md`. `~/.codex/AGENTS.md` is generated from it
+by chezmoi, only on machines that use Codex. Rules for one agent only go in
+that agent's own section (`~/.claude/CLAUDE.md`, or the "Codex-specific rules"
+section of `home/private_dot_codex/AGENTS.md.tmpl`).
+
 ## Machine-specific settings
 
 Kept out of this public repository on purpose:

@@ -34,6 +34,7 @@ Most of the time goes into `brew bundle` and `mise install`.
 backup=~/dotfiles-backup        # used again in step 6 and in "Rolling back"
 mkdir "$backup"                 # fails if an older backup is still there: move it away first
 cp -p ~/.gitconfig ~/.tool-versions ~/.claude/CLAUDE.md "$backup"/
+[ -f ~/.codex/AGENTS.md ] && cp -p ~/.codex/AGENTS.md "$backup"/codex-AGENTS.md
 cp -p ~/.config/git/ignore "$backup"/git-ignore
 cp -p ~/.gnupg/gpg-agent.conf "$backup"/
 
@@ -173,7 +174,8 @@ Read the diff before you confirm. Expected changes:
   `~/.config/nvim/`, `~/.config/mise/config.toml`
 - `~/.gitconfig`: the template, without your `insteadOf` (now in `.gitconfig.local`)
 - `~/.config/git/ignore`: adds `.DS_Store` and `*.swp`
-- `~/.claude/CLAUDE.md`: the repository's version (global rules for Claude Code)
+- `~/.claude/CLAUDE.md`: the repository's version, which imports the shared agent rules
+- new: `~/.config/agents/AGENTS.md` (rules for all coding agents) and, if you use Codex, `~/.codex/AGENTS.md` generated from it
 - `~/.gnupg/gpg-agent.conf`: only the passphrase cache times change (see the comment in it)
 - `~/.claude/settings.json` is only created when missing, so yours is kept
 
@@ -300,6 +302,7 @@ while read -r link target; do ln -sfn "$target" "$link"; done < "$backup"/symlin
 cp -p "$backup"/.gitconfig ~/.gitconfig
 mkdir -p ~/.claude ~/.config/git
 cp -p "$backup"/CLAUDE.md ~/.claude/CLAUDE.md
+[ -f "$backup"/codex-AGENTS.md ] && cp -p "$backup"/codex-AGENTS.md ~/.codex/AGENTS.md
 cp -p "$backup"/git-ignore ~/.config/git/ignore
 cp -p "$backup"/gpg-agent.conf ~/.gnupg/gpg-agent.conf
 mv "$backup"/tool-versions.global ~/.tool-versions 2>/dev/null || cp -p "$backup"/.tool-versions ~/.tool-versions
