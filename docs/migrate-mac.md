@@ -173,7 +173,7 @@ Read the diff before you confirm. Expected changes:
   `~/.config/nvim/`, `~/.config/mise/config.toml`
 - `~/.gitconfig`: the template, without your `insteadOf` (now in `.gitconfig.local`)
 - `~/.config/git/ignore`: adds `.DS_Store` and `*.swp`
-- `~/.claude/CLAUDE.md`: no change
+- `~/.claude/CLAUDE.md`: the repository's version (global rules for Claude Code)
 - `~/.gnupg/gpg-agent.conf`: only the passphrase cache times change (see the comment in it)
 - `~/.claude/settings.json` is only created when missing, so yours is kept
 
