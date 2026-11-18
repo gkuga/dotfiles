@@ -3,5 +3,9 @@ pinentry-program {{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/lo
 {{- else -}}
 pinentry-program /usr/bin/pinentry-curses
 {{- end }}
-default-cache-ttl 6000
-max-cache-ttl 72000
+# Passphrase cache: forget it after a day without use, and two weeks after it
+# was entered at the latest. While cached, any process running as this user can
+# sign. The cache is in memory only; restarting the agent (logout, WSL restart)
+# clears it.
+default-cache-ttl 86400
+max-cache-ttl 1209600
