@@ -18,7 +18,8 @@ At the PC or over Remote Desktop, until SSH into WSL works:
    prompt. Restart Windows. The logon task is not registered yet: it waits
    for Debian.
 2. Run `install.ps1` again (see "From an existing checkout" below). It
-   installs Debian, then sets it up (step `debian`): the Linux user and its
+   adds the Hyper-V firewall rule that lets SSH into WSL (a second UAC
+   prompt), installs Debian, then sets it up (step `debian`): the Linux user and its
    password, `openssh-server` and mDNS, `authorized_keys` from
    `github.com/gkuga.keys`, a restart of the distro, and `install.sh` inside
    it, where you answer the chezmoi prompts. Last, it registers the logon
@@ -31,8 +32,9 @@ At the PC or over Remote Desktop, until SSH into WSL works:
 ## 1. Run install.ps1
 
 Nothing in `install.ps1` needs an administrator except installing WSL
-itself, which it does only after you answer `y` (one UAC prompt, on a new PC;
-with `-Yes` it prints the command instead). Apps are installed with
+itself and adding the Hyper-V firewall rule for SSH into WSL, which it does
+only after you answer `y` (one UAC prompt each, on a new PC; with `-Yes` it
+prints the commands instead). Apps are installed with
 `winget --scope user`; every package in `winget.txt` has a per-user installer
 (check a new one with `winget show --id ID --scope user`, and keep out one
 whose installer still asks for elevation). So later runs do not show a UAC
@@ -64,7 +66,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 |---|---|
 | `packages` | `winget install --scope user` for each ID in `packages/winget.txt` that is missing; warns if Docker Desktop is missing |
 | `dotfiles` | installs chezmoi, shows the diff, applies it after confirmation |
-| `wsl` | installs WSL (one UAC prompt) and the Debian distro, each after confirmation |
+| `wsl` | installs WSL (one UAC prompt), adds the Hyper-V firewall rule for SSH into WSL (one UAC prompt), and installs the Debian distro, each after confirmation |
 | `debian` | in Debian: packages for SSH and mDNS, the Linux user, `/etc/wsl.conf`, `authorized_keys` from GitHub; then `install.sh` inside it, until chezmoi is set up there |
 | `tasks` | makes the Task Scheduler folder `\dotfiles-<user SID>\` match `scheduled-tasks/*.xml` |
 
@@ -74,6 +76,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 | install with winget: ...? | `y` |
 | apply these dotfile changes? | `y` after reading the diff |
 | install WSL now? | `y` on a new PC, then approve the UAC prompt and restart Windows |
+| add the rule now? (Hyper-V firewall, TCP 22) | `y`, then approve the UAC prompt |
 | install the Debian distro? | `y` on a new PC |
 | Linux user name for Debian | Enter for `gkuga` |
 | New password (in Debian) | the password for `sudo` |

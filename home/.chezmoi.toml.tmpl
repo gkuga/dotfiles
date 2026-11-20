@@ -21,6 +21,9 @@ sourceDir = {{ .chezmoi.workingTree | quote }}
 # The repository root (it holds .chezmoiroot), so that plain `chezmoi diff`
 # and `chezmoi apply` work without --source.
 sourceDir = {{ .chezmoi.workingTree | quote }}
+# File modes do not depend on the shell's umask (002 in a Debian login, 022
+# when install.ps1 runs install.sh through wsl.exe).
+umask = 0o022
 
 [data]
   name = {{ $name | quote }}

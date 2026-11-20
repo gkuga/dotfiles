@@ -89,6 +89,30 @@ function Get-WslDistro {
   }
 }
 
+# Runs a PowerShell command as administrator, after asking: one UAC prompt on
+# this screen. Never with -Yes or in a dry run, where nobody may see the
+# prompt; returns $false then, or when it was declined or failed, so that the
+# caller can print the command to run by hand.
+function Invoke-Elevated([string]$Question, [string]$Command) {
+  if ((Test-DryRun) -or $env:ASSUME_YES -eq '1') { return $false }
+  if (-not (Confirm-Action "$Question (asks for an administrator once, on this screen)")) { return $false }
+  # -EncodedCommand: Start-Process joins -ArgumentList without quoting.
+  $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($Command))
+  try {
+    $p = Start-Process -FilePath powershell.exe -Verb RunAs -Wait -PassThru `
+      -ArgumentList '-NoProfile', '-EncodedCommand', $encoded
+  } catch {
+    # Also when the UAC prompt is declined.
+    Write-Warn "did not run as administrator: $($_.Exception.Message)"
+    return $false
+  }
+  if ($p.ExitCode -ne 0) {
+    Write-Warn "the administrator command failed (exit code $($p.ExitCode))"
+    return $false
+  }
+  return $true
+}
+
 $WingetCommon = @('--exact', '--accept-source-agreements', '--disable-interactivity')
 # winget exit codes that mean the package is there already: "no applicable
 # upgrade" and "already installed". They come up for apps that `winget list`
