@@ -39,10 +39,16 @@ Steps (in order): packages, dotfiles, wsl, tasks
 # Every step works for the user who runs it: winget installs per user, and
 # chezmoi and the scheduled tasks use that user's profile. Elevated, that can
 # be another account (an administrator's credentials on a standard account),
-# and it is never needed: installing WSL asks for elevation by itself.
+# and it is not needed: installing WSL asks for elevation by itself. Where
+# every shell is elevated (UAC off, the built-in Administrator), go on after
+# confirmation.
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 if ((New-Object Security.Principal.WindowsPrincipal $identity).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-  throw 'run install.ps1 from a normal PowerShell, not as administrator: every step installs for the current user'
+  Write-Host "warning: running as administrator ($($identity.Name)). Every step installs for this account;"
+  Write-Host 'run install.ps1 from a normal PowerShell unless this is the account you use.'
+  if (-not $Yes -and -not $DryRun -and (Read-Host 'continue as administrator? [y/N]') -notmatch '^(y|yes)$') {
+    return
+  }
 }
 
 # Started from irm there is no checkout yet: clone it, then run its copy.

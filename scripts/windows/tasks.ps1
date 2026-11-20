@@ -1,4 +1,4 @@
-# Makes this user's Task Scheduler folder \dotfiles\<user SID>\ match
+# Makes this user's Task Scheduler folder \dotfiles-<user SID>\ match
 # scheduled-tasks/*.xml: a task is registered when it is missing, its XML
 # changed, or it was disabled by hand, and a task that this script registered
 # but whose XML file is gone is removed. Tasks run as the current user
@@ -6,8 +6,10 @@
 . "$PSScriptRoot\lib.ps1"
 
 $sid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
-# One folder per user: every user of the PC shares the Task Scheduler tree.
-$taskPath = "\dotfiles\$sid\"
+# One folder per user, directly under the root: every user of the PC shares
+# the Task Scheduler tree, and a folder created by one user may not let
+# another create subfolders in it.
+$taskPath = "\dotfiles-$sid\"
 $sourcePrefix = 'dotfiles:sha256:'
 $sha = [Security.Cryptography.SHA256]::Create()
 $ns = 'http://schemas.microsoft.com/windows/2004/02/mit/task'
@@ -34,7 +36,8 @@ foreach ($file in @(Get-ChildItem -LiteralPath (Join-Path $env:REPO_DIR 'schedul
   $enabled = -not ($settings -and $settings['Enabled'] -and $settings['Enabled'].InnerText -eq 'false')
   $want[$file.BaseName] = @{
     Source = $node.InnerText; Xml = $doc.OuterXml; Enabled = $enabled
-    NeedsWsl = $text -match 'wsl\.exe'
+    # Whether an action runs WSL (the command or its arguments, not comments).
+    NeedsWsl = [bool]($doc.GetElementsByTagName('Exec') | Where-Object { $_.InnerText -match '\bwsl(\.exe)?\b' })
   }
 }
 # A missing folder means no tasks yet; any other error (access denied, ...)
@@ -70,7 +73,7 @@ foreach ($name in @($want.Keys | Sort-Object)) {
     Write-Warn "left alone: $taskPath$name was not registered by install.ps1 (it has no dotfiles Source)"
     continue
   }
-  if ($want[$name].NeedsWsl -and -not $hasDebian) {
+  if (-not $task -and $want[$name].NeedsWsl -and -not $hasDebian) {
     Write-Warn "skipped $taskPath$name until the Debian distro is installed (run install.ps1 again then)"
     continue
   }

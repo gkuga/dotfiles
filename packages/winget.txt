@@ -3,10 +3,10 @@
 #
 # A package that is installed already is left alone, however it was
 # installed. A missing one is installed for the current user (--scope user),
-# so that installing never needs an administrator or a UAC prompt, and works
-# over SSH. A package without a user-scope installer (Google.Chrome) is then
-# reported, to be installed once by hand; check with
-# `winget show --id ID --scope user`.
+# so that installing needs no administrator or UAC prompt and works over SSH.
+# Check a new package with `winget show --id ID --scope user`: it must have a
+# per-user installer that does not ask for elevation. Google.Chrome has none:
+# where it is missing, it is reported, to be installed once by hand.
 #
 # Only apps chosen for this setup. Software that the PC's administrator
 # installs and manages is left out, and so is Docker Desktop: it is installed

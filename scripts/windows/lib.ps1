@@ -68,9 +68,12 @@ $Wsl = Join-Path $env:SystemRoot 'System32\wsl.exe'
 # waits for a key and then installs WSL (Windows 11). `wsl --status` would
 # also fail while WSL has no distro yet, right after
 # `wsl --install --no-distribution`.
+# WSL comes as a Store package (`wsl --install`) or as an MSI from its GitHub
+# releases, which installs into Program Files\WSL.
 function Test-Wsl {
-  return (Test-Path -LiteralPath $Wsl) -and
-    [bool](Get-AppxPackage -Name 'MicrosoftCorporationII.WindowsSubsystemForLinux' -ErrorAction SilentlyContinue)
+  if (-not (Test-Path -LiteralPath $Wsl)) { return $false }
+  if (Test-Path -LiteralPath (Join-Path $env:ProgramFiles 'WSL\wsl.exe')) { return $true }
+  return [bool](Get-AppxPackage -Name 'MicrosoftCorporationII.WindowsSubsystemForLinux' -ErrorAction SilentlyContinue)
 }
 
 # The names of the installed WSL distros (empty without WSL).

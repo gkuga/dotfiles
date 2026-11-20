@@ -12,10 +12,11 @@ Debian inside WSL is set up afterwards with [setup-wsl.md](setup-wsl.md).
 
 At the PC or over Remote Desktop, until SSH into WSL works:
 
-1. In PowerShell (not as administrator: `install.ps1` refuses to run
-   elevated), run the one-liner from step 1. It installs the apps, writes
+1. In PowerShell (not as administrator: elevated, `install.ps1` warns and
+   asks first), run the one-liner from step 1. It installs the apps, writes
    `.wslconfig`, and offers to install WSL: answer `y` and approve the one UAC
-   prompt. Restart Windows. The logon task waits for Debian.
+   prompt. Restart Windows. The logon task is not registered yet: it waits
+   for Debian.
 2. Run `install.ps1` again (see "From an existing checkout" below). It
    installs Debian and registers the logon task.
 3. `wsl -d Debian`: create the Linux user, then do step 2 of
@@ -28,7 +29,10 @@ At the PC or over Remote Desktop, until SSH into WSL works:
 
 Nothing in `install.ps1` needs an administrator except installing WSL
 itself, which it does only after you answer `y` (one UAC prompt, on a new PC;
-with `-Yes` it prints the command instead). So later runs never show a UAC
+with `-Yes` it prints the command instead). Apps are installed with
+`winget --scope user`; every package in `winget.txt` has a per-user installer
+(check a new one with `winget show --id ID --scope user`, and keep out one
+whose installer still asks for elevation). So later runs do not show a UAC
 prompt and also work over SSH (through WSL, with `powershell.exe`). An app
 whose winget package has no per-user installer (`Google.Chrome`) is the other
 exception: on a PC where it is not installed yet, install it once by hand.
@@ -58,7 +62,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 | `packages` | `winget install --scope user` for each ID in `packages/winget.txt` that is missing; warns if Docker Desktop is missing |
 | `dotfiles` | installs chezmoi, shows the diff, applies it after confirmation |
 | `wsl` | installs WSL (one UAC prompt) and the Debian distro, each after confirmation |
-| `tasks` | makes the Task Scheduler folder `\dotfiles\<user SID>\` match `scheduled-tasks/*.xml` |
+| `tasks` | makes the Task Scheduler folder `\dotfiles-<user SID>\` match `scheduled-tasks/*.xml` |
 
 | Prompt | Answer |
 |---|---|
@@ -109,16 +113,16 @@ it: run `wsl -d Debian` once to create the Linux user, then continue with
 ## 4. Scheduled tasks
 
 Each `scheduled-tasks/NAME.xml` is a Task Scheduler task (the format that
-Task Scheduler's own Export writes), registered as `\dotfiles\<user SID>\NAME`
+Task Scheduler's own Export writes), registered as `\dotfiles-<user SID>\NAME`
 for the user who runs `install.ps1` (one folder per user, since all users
 share the Task Scheduler tree). The step is idempotent: it registers a task
 that is missing, whose XML changed (a hash of the XML is kept in the task's
 Source field) or that was disabled by hand, leaves the others alone, and
 removes a task it registered whose XML file is gone; a task added to the
-folder by hand is left alone, even under the same name. A task that starts
-WSL (its XML mentions `wsl.exe`) is registered only once the Debian distro
-exists. Other changes made in Task Scheduler (a trigger,
-an action) are not detected: change the XML instead. To add a task, create it
+folder by hand is left alone, even under the same name. A task whose action
+runs `wsl.exe` is registered only once the Debian distro exists, on the next
+`install.ps1` run. Other changes made in Task Scheduler (a trigger, an
+action) are not detected: change the XML instead. To add a task, create it
 in Task Scheduler, export it, replace the user ID with `__USER_SID__`, and put
 the file there.
 
@@ -126,9 +130,7 @@ the file there.
   Windows, without opening a window, so that SSH into WSL works without
   opening a terminal; `instanceIdleTimeout=-1` keeps it running after that.
   It does not run while nobody is logged on: after a restart, someone has to
-  log on (at the PC or over Remote Desktop) first. Until the Debian distro
-  exists it fails at each logon; Task Scheduler shows that as the last run
-  result.
+  log on (at the PC or over Remote Desktop) first.
 
 ## 5. Once, by hand
 

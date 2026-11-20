@@ -30,7 +30,14 @@ if (-not (Test-Wsl)) {
 if ((Get-WslDistro) -contains 'Debian') {
   Write-Log 'the Debian distro is installed'
 } elseif (Confirm-Action 'install the Debian distro (wsl --install -d Debian)?') {
-  Invoke-Native $Wsl @('--install', '--distribution', 'Debian', '--no-launch')
+  # wsl.exe prints UTF-16 unless told otherwise.
+  $saved = $env:WSL_UTF8
+  $env:WSL_UTF8 = '1'
+  try {
+    Invoke-Native $Wsl @('--install', '--distribution', 'Debian', '--no-launch')
+  } finally {
+    $env:WSL_UTF8 = $saved
+  }
   if (-not (Test-DryRun)) { Write-Log "start it with 'wsl -d Debian' and create the Linux user" }
 } else {
   Write-Warn 'skipped the Debian distro'
