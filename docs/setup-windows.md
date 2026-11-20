@@ -41,7 +41,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 | `packages` | `winget install --scope user` for each ID in `packages/winget.txt` that is missing; warns if Docker Desktop is missing |
 | `dotfiles` | installs chezmoi, shows the diff, applies it after confirmation |
 | `wsl` | checks that WSL is installed; installs the Debian distro after confirmation |
-| `tasks` | makes the Task Scheduler folder `\dotfiles\` match `scheduled-tasks/*.xml` |
+| `tasks` | makes the Task Scheduler folder `\dotfiles\<user SID>\` match `scheduled-tasks/*.xml` |
 
 | Prompt | Answer |
 |---|---|
@@ -88,18 +88,24 @@ it: run `wsl -d Debian` once to create the Linux user, then continue with
 ## 4. Scheduled tasks
 
 Each `scheduled-tasks/NAME.xml` is a Task Scheduler task (the format that
-Task Scheduler's own Export writes), registered as `\dotfiles\NAME` for the
-user who runs `install.ps1`. The step is idempotent: it registers a task
-that is missing or whose XML changed (a hash of the XML is kept in the task's
-Source field), leaves the others alone, and removes a task in `\dotfiles\`
-whose XML file is gone. To add a task, create it in Task Scheduler, export
-it, replace the user ID with `__USER_SID__`, and put the file there.
+Task Scheduler's own Export writes), registered as `\dotfiles\<user SID>\NAME`
+for the user who runs `install.ps1` (one folder per user, since all users
+share the Task Scheduler tree). The step is idempotent: it registers a task
+that is missing, whose XML changed (a hash of the XML is kept in the task's
+Source field) or that was disabled by hand, leaves the others alone, and
+removes a task it registered whose XML file is gone; a task added to the
+folder by hand is left alone. Other changes made in Task Scheduler (a trigger,
+an action) are not detected: change the XML instead. To add a task, create it
+in Task Scheduler, export it, replace the user ID with `__USER_SID__`, and put
+the file there.
 
 - `start-wsl`: starts the Debian distro 30 seconds after you log on to
   Windows, without opening a window, so that SSH into WSL works without
   opening a terminal; `instanceIdleTimeout=-1` keeps it running after that.
   It does not run while nobody is logged on: after a restart, someone has to
-  log on (at the PC or over Remote Desktop) first.
+  log on (at the PC or over Remote Desktop) first. Until the Debian distro
+  exists it fails at each logon; Task Scheduler shows that as the last run
+  result.
 
 ## 5. Once, by hand
 

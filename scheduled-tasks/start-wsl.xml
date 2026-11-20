@@ -3,7 +3,7 @@
   SSH into WSL works without opening a terminal first. The distro then keeps
   running because .wslconfig sets instanceIdleTimeout=-1.
 
-  Registered by install.ps1 (step tasks) as \dotfiles\start-wsl.
+  Registered by install.ps1 (step tasks) as \dotfiles\<user SID>\start-wsl.
   __USER_SID__ is replaced with the SID of the user who runs install.ps1.
   conhost.exe headless keeps a console window from opening at logon.
 -->
