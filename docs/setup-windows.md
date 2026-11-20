@@ -34,7 +34,8 @@ At the PC or over Remote Desktop, until SSH into WSL works:
 Nothing in `install.ps1` needs an administrator except installing WSL
 itself and adding the Hyper-V firewall rule for SSH into WSL, which it does
 only after you answer `y` (one UAC prompt each, on a new PC; with `-Yes` it
-prints the commands instead). Apps are installed with
+prints the commands instead). Over SSH, nobody sees a UAC prompt: run with
+`-Yes` there, or answer `n`, and run the printed command at the PC. Apps are installed with
 `winget --scope user`; every package in `winget.txt` has a per-user installer
 (check a new one with `winget show --id ID --scope user`, and keep out one
 whose installer still asks for elevation). So later runs do not show a UAC

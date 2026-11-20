@@ -96,8 +96,12 @@ function Get-WslDistro {
 function Invoke-Elevated([string]$Question, [string]$Command) {
   if ((Test-DryRun) -or $env:ASSUME_YES -eq '1') { return $false }
   if (-not (Confirm-Action "$Question (asks for an administrator once, on this screen)")) { return $false }
+  # The elevated window closes when the command ends, so its error is written
+  # to a file and shown here.
+  $log = Join-Path ([IO.Path]::GetTempPath()) ('dotfiles-elevated-' + [guid]::NewGuid() + '.log')
+  $wrapped = "`$ErrorActionPreference = 'Stop'; try { $Command } catch { (`$_ | Out-String) | Set-Content -LiteralPath '$log'; exit 1 }"
   # -EncodedCommand: Start-Process joins -ArgumentList without quoting.
-  $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($Command))
+  $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($wrapped))
   try {
     $p = Start-Process -FilePath powershell.exe -Verb RunAs -Wait -PassThru `
       -ArgumentList '-NoProfile', '-EncodedCommand', $encoded
@@ -106,11 +110,13 @@ function Invoke-Elevated([string]$Question, [string]$Command) {
     Write-Warn "did not run as administrator: $($_.Exception.Message)"
     return $false
   }
-  if ($p.ExitCode -ne 0) {
-    Write-Warn "the administrator command failed (exit code $($p.ExitCode))"
-    return $false
+  $failed = $p.ExitCode -ne 0
+  if ($failed) { Write-Warn "the administrator command failed (exit code $($p.ExitCode))" }
+  if (Test-Path -LiteralPath $log) {
+    Get-Content -LiteralPath $log | ForEach-Object { Write-Warn "  $_" }
+    Remove-Item -LiteralPath $log -Force -ErrorAction SilentlyContinue
   }
-  return $true
+  return -not $failed
 }
 
 $WingetCommon = @('--exact', '--accept-source-agreements', '--disable-interactivity')
