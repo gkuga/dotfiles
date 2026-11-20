@@ -3,7 +3,8 @@
 #   darwin: Docker Desktop is installed by hand (it updates itself); warn if missing
 #   wsl:    /etc/wsl.conf (systemd, default user); checks the Windows-side
 #           %USERPROFILE%\.wslconfig, which install.ps1 manages on Windows;
-#           Docker comes from Docker Desktop
+#           Docker Engine inside the distro, unless Docker Desktop's WSL
+#           integration is on
 #   linux:  Docker Engine from the official Docker apt repository
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -162,13 +163,20 @@ platform_wsl() {
   log "changes to /etc/wsl.conf apply after 'wsl --shutdown' in Windows"
   log "(not while you depend on SSH into WSL: nothing starts WSL again by itself)"
 
-  if ! has docker; then
-    warn "docker not found: enable WSL integration for this distro in Docker Desktop"
-    warn "(Settings > Resources > WSL integration)"
+  # Docker Engine runs under systemd in the distro: no Docker Desktop (which
+  # needs an administrator to install, and a paid subscription in larger
+  # organizations). A distro that uses Docker Desktop's WSL integration is
+  # left alone; its docker command is missing while Desktop is not running.
+  if [ -d /mnt/wsl/docker-desktop ]; then
+    log "Docker Desktop's WSL integration is on; not installing Docker Engine"
+  else
+    install_docker_engine
   fi
 }
 
-platform_linux() {
+# Installs Docker Engine from the official Docker apt repository, unless a
+# docker command is there already.
+install_docker_engine() {
   if has docker; then
     return 0
   fi
@@ -204,6 +212,10 @@ Signed-By: /etc/apt/keyrings/docker.asc" root
   as_root apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
   as_root usermod -aG docker "$(id -un)"
   log "log out and back in to use docker without sudo"
+}
+
+platform_linux() {
+  install_docker_engine
 }
 
 case "$PLATFORM" in

@@ -9,8 +9,8 @@
 # where it is missing, it is reported, to be installed once by hand.
 #
 # Only apps chosen for this setup. Software that the PC's administrator
-# installs and manages is left out, and so is Docker Desktop: it is installed
-# by hand from docker.com because it updates itself (as on macOS).
+# installs and manages is left out, and so is Docker Desktop: Docker Engine
+# runs inside WSL instead (scripts/platform.sh).
 Git.Git
 twpayne.chezmoi
 Microsoft.WindowsTerminal
