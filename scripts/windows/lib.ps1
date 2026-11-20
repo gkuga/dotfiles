@@ -66,6 +66,8 @@ $WingetCommon = @('--exact', '--accept-source-agreements', '--disable-interactiv
 # upgrade" and "already installed". They come up for apps that `winget list`
 # cannot match to their winget ID.
 $WingetAlreadyInstalled = @(-1978335189, -1978335135)
+# "Installed, but a restart is needed to finish."
+$WingetRebootRequired = -1978334967
 
 # Installs one winget package by ID (printed only in a dry run).
 function Install-WingetPackage([string]$Id) {
@@ -78,6 +80,10 @@ function Install-WingetPackage([string]$Id) {
     throw 'winget not found: install or update "App Installer" from the Microsoft Store'
   }
   & winget @arguments
+  if ($LASTEXITCODE -eq $WingetRebootRequired) {
+    Write-Warn "$Id is installed; restart Windows to finish"
+    return
+  }
   if ($LASTEXITCODE -ne 0 -and $WingetAlreadyInstalled -notcontains $LASTEXITCODE) {
     throw "winget install $Id failed (exit code $LASTEXITCODE)"
   }

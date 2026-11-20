@@ -24,6 +24,10 @@ if (Test-DryRun) {
   # Use a throwaway config and state so that a dry run leaves no trace.
   $tmp = Join-Path ([IO.Path]::GetTempPath()) ('chezmoi-dry-run-' + [guid]::NewGuid())
   New-Item -ItemType Directory -Path $tmp | Out-Null
+  # Start from the saved answers, so that the dry run neither asks again nor
+  # shows a diff that the real run would not make.
+  $config = Join-Path $HOME '.config\chezmoi\chezmoi.toml'
+  if (Test-Path -LiteralPath $config) { Copy-Item -LiteralPath $config -Destination (Join-Path $tmp 'chezmoi.toml') }
   try {
     $cz = @('--source', $env:REPO_DIR, '--config', (Join-Path $tmp 'chezmoi.toml'),
       '--persistent-state', (Join-Path $tmp 'state.boltdb'))
@@ -35,7 +39,8 @@ if (Test-DryRun) {
   return
 }
 
-# Show what is going to change before touching existing files.
+# Show what is going to change before touching existing files. `chezmoi init`
+# writes only chezmoi's own config (the answers to its questions) first.
 $cz = @('--source', $env:REPO_DIR)
 Invoke-Chezmoi ($cz + 'init')
 $changes = (& chezmoi @cz diff --no-pager) -join "`n"

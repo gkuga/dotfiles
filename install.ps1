@@ -24,7 +24,8 @@ if ($Help) {
 Usage: install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]
 
   -DryRun  print what would change, change nothing
-  -Yes     answer yes to every confirmation
+  -Yes     answer yes to every confirmation (chezmoi still asks its own
+           questions on the first init)
   -Only    run only the given steps
   -Help    show this help
 
@@ -50,6 +51,9 @@ if (-not $here -or -not (Test-Path -LiteralPath (Join-Path $here 'scripts\window
   if (-not (Test-Path -LiteralPath (Join-Path $repoDir '.git'))) {
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
       if ($DryRun) { throw 'git is required: winget install --id Git.Git --exact' }
+      if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+        throw 'winget not found: install or update "App Installer" from the Microsoft Store'
+      }
       Write-Host 'installing Git with winget, to clone the repository'
       winget install --id Git.Git --exact --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
       # -1978335189 / -1978335135: no applicable upgrade / already installed

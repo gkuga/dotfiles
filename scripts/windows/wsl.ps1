@@ -8,10 +8,13 @@ $wsl = Join-Path $env:SystemRoot 'System32\wsl.exe'
 $savedUtf8 = $env:WSL_UTF8
 $env:WSL_UTF8 = '1'
 try {
-  # Not `wsl --status`: that fails while WSL has no distro yet, which is the
-  # state right after `wsl --install --no-distribution`.
-  & $wsl --version | Out-Null
-  if ($LASTEXITCODE -ne 0) {
+  # Look for the WSL package instead of running wsl.exe: without WSL,
+  # wsl.exe is missing (Windows 10) or a stub that waits for a key and then
+  # installs WSL (Windows 11). `wsl --status` would also fail while WSL has no
+  # distro yet, right after `wsl --install --no-distribution`.
+  $installed = (Test-Path -LiteralPath $wsl) -and
+    [bool](Get-AppxPackage -Name 'MicrosoftCorporationII.WindowsSubsystemForLinux' -ErrorAction SilentlyContinue)
+  if (-not $installed) {
     Write-Warn 'WSL is not installed. In an administrator PowerShell, run:'
     Write-Warn '  wsl --install --no-distribution'
     Write-Warn 'then restart Windows and run install.ps1 again.'

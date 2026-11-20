@@ -10,7 +10,7 @@ networkingMode=mirrored
 # Disk size limit for distros created from now on.
 defaultVhdSize=128GB
 {{- if .wslMemory }}
-{{-   if not (regexMatch "^[0-9]+(MB|GB)$" .wslMemory) }}
+{{-   if not (regexMatch "(?i)^[0-9]+(MB|GB)$" .wslMemory) }}
 {{-     fail (printf "wslMemory in chezmoi.toml must be a number with MB or GB, such as 12GB, not %q" .wslMemory) }}
 {{-   end }}
 # Per-machine value, asked on `chezmoi init` (wslMemory).
