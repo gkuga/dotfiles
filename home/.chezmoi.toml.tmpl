@@ -1,13 +1,23 @@
 {{- /* Per-machine values. Asked once on `chezmoi init`, then stored in
        ~/.config/chezmoi/chezmoi.toml (never committed). */ -}}
-{{- $name := promptStringOnce . "name" "Git user.name" "Gaku Yasui" -}}
-{{- $email := promptStringOnce . "email" "Git user.email" -}}
-{{- $gpgsign := promptBoolOnce . "gpgsign" "Sign git commits with GPG" true -}}
 {{- /* No "=" or "," in prompts: `chezmoi init --promptString PROMPT=VALUE` could not set them. */ -}}
-{{- $signingkey := "" -}}
-{{- if $gpgsign -}}
-{{-   $signingkey = promptStringOnce . "signingkey" "GPG signing key ID (leave empty for the default key)" "" -}}
-{{- end -}}
+{{- if eq .chezmoi.os "windows" -}}
+{{- /* Windows only gets the files listed in .chezmoiignore: no git or GPG. */ -}}
+{{-   $wslMemory := promptStringOnce . "wslMemory" "WSL memory limit such as 12GB (leave empty for the WSL default)" "" -}}
+# The repository root (it holds .chezmoiroot), so that plain `chezmoi diff`
+# and `chezmoi apply` work without --source.
+sourceDir = {{ .chezmoi.workingTree | quote }}
+
+[data]
+  wslMemory = {{ $wslMemory | quote }}
+{{- else -}}
+{{-   $name := promptStringOnce . "name" "Git user.name" "Gaku Yasui" -}}
+{{-   $email := promptStringOnce . "email" "Git user.email" -}}
+{{-   $gpgsign := promptBoolOnce . "gpgsign" "Sign git commits with GPG" true -}}
+{{-   $signingkey := "" -}}
+{{-   if $gpgsign -}}
+{{-     $signingkey = promptStringOnce . "signingkey" "GPG signing key ID (leave empty for the default key)" "" -}}
+{{-   end -}}
 # The repository root (it holds .chezmoiroot), so that plain `chezmoi diff`
 # and `chezmoi apply` work without --source.
 sourceDir = {{ .chezmoi.workingTree | quote }}
@@ -17,3 +27,4 @@ sourceDir = {{ .chezmoi.workingTree | quote }}
   email = {{ $email | quote }}
   gpgsign = {{ $gpgsign }}
   signingkey = {{ $signingkey | quote }}
+{{- end }}

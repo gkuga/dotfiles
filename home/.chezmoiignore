@@ -1,3 +1,27 @@
+{{- if eq .chezmoi.os "windows" }}
+{{- /* Windows gets only .wslconfig and the coding-agent rules (.claude,
+       .config/agents). Everything else is for bash and Unix tools; a new
+       file for Unix must be added here too. */}}
+.bash_profile
+.bash.d
+.bashrc
+.codex
+.config/git
+.config/mise
+.config/nvim
+.gitconfig
+.gnupg
+.inputrc
+.profile
+.profile.d
+.screenrc
+.tmux.conf
+.vimrc
+reload-gpg-agent.sh
+{{- else }}
+{{- /* .wslconfig belongs in the Windows user profile, not in a Unix home. */}}
+.wslconfig
+{{- end }}
 {{- /* ~/.codex only where Codex is used (its command exists or it already created ~/.codex). */ -}}
 {{- if and (not (lookPath "codex")) (not (stat (joinPath .chezmoi.homeDir ".codex"))) }}
 .codex
