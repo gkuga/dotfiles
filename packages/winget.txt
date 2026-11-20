@@ -1,6 +1,13 @@
 # winget packages for the Windows side (install.ps1, step packages).
 # One package ID per line; `winget search NAME` finds IDs.
 #
+# A package that is installed already is left alone, however it was
+# installed. A missing one is installed for the current user (--scope user),
+# so that installing never needs an administrator or a UAC prompt, and works
+# over SSH. A package without a user-scope installer (Google.Chrome) is then
+# reported, to be installed once by hand; check with
+# `winget show --id ID --scope user`.
+#
 # Only apps chosen for this setup. Software that the PC's administrator
 # installs and manages is left out, and so is Docker Desktop: it is installed
 # by hand from docker.com because it updates itself (as on macOS).

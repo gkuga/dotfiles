@@ -2,15 +2,19 @@
 
 The Windows side of a PC that runs WSL: the apps installed with winget, the
 files that live in the Windows user profile (`%USERPROFILE%\.wslconfig` and
-the coding-agent rules for the Windows build of Claude Code), and WSL itself.
+the coding-agent rules for the Windows build of Claude Code), WSL itself, and
+a scheduled task that starts WSL at logon.
 Debian inside WSL is set up afterwards with [setup-wsl.md](setup-wsl.md).
 
 `install.ps1` runs in the Windows PowerShell 5.1 that comes with Windows.
 
 ## 1. Run install.ps1
 
-At the PC or over Remote Desktop, not over SSH: some installers, and
-`wsl --install`, show a UAC prompt on the Windows screen.
+Nothing in `install.ps1` needs an administrator, so it never shows a UAC
+prompt and also runs over SSH (through WSL, with `powershell.exe`). The only
+exceptions are done once, by hand, at the PC or over Remote Desktop: installing
+WSL itself (step 3), and an app whose winget package has no per-user installer
+(`Google.Chrome`) on a PC where it is not installed yet.
 
 On a new PC, in PowerShell:
 
@@ -34,9 +38,10 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 
 | Step | What it does |
 |---|---|
-| `packages` | `winget install` for each ID in `packages/winget.txt` that is missing; warns if Docker Desktop is missing |
+| `packages` | `winget install --scope user` for each ID in `packages/winget.txt` that is missing; warns if Docker Desktop is missing |
 | `dotfiles` | installs chezmoi, shows the diff, applies it after confirmation |
 | `wsl` | checks that WSL is installed; installs the Debian distro after confirmation |
+| `tasks` | makes the Task Scheduler folder `\dotfiles\` match `scheduled-tasks/*.xml` |
 
 | Prompt | Answer |
 |---|---|
@@ -44,6 +49,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 | install with winget: ...? | `y` |
 | apply these dotfile changes? | `y` after reading the diff |
 | install the Debian distro? | `y` on a new PC |
+| register scheduled task ...? | `y` |
 
 ## 2. What chezmoi manages on Windows
 
@@ -79,7 +85,23 @@ and run `install.ps1` again. The Debian distro is installed without starting
 it: run `wsl -d Debian` once to create the Linux user, then continue with
 [setup-wsl.md](setup-wsl.md).
 
-## 4. Once, by hand
+## 4. Scheduled tasks
+
+Each `scheduled-tasks/NAME.xml` is a Task Scheduler task (the format that
+Task Scheduler's own Export writes), registered as `\dotfiles\NAME` for the
+user who runs `install.ps1`. The step is idempotent: it registers a task
+that is missing or whose XML changed (a hash of the XML is kept in the task's
+Source field), leaves the others alone, and removes a task in `\dotfiles\`
+whose XML file is gone. To add a task, create it in Task Scheduler, export
+it, replace the user ID with `__USER_SID__`, and put the file there.
+
+- `start-wsl`: starts the Debian distro 30 seconds after you log on to
+  Windows, without opening a window, so that SSH into WSL works without
+  opening a terminal; `instanceIdleTimeout=-1` keeps it running after that.
+  It does not run while nobody is logged on: after a restart, someone has to
+  log on (at the PC or over Remote Desktop) first.
+
+## 5. Once, by hand
 
 - Docker Desktop: install it from docker.com (it updates itself, so it is not
   in `winget.txt`), then enable the Debian distro under Settings > Resources >

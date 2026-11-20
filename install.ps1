@@ -1,10 +1,12 @@
 # Bootstraps the Windows side of the development environment: winget
-# packages, dotfiles (chezmoi: .wslconfig and the coding-agent rules) and WSL.
+# packages, dotfiles (chezmoi: .wslconfig and the coding-agent rules), WSL and
+# scheduled tasks. Nothing here needs an administrator, so it also runs over
+# SSH; only installing WSL itself does, and that command is printed instead.
 #
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/gkuga/dotfiles/main/install.ps1)))
 #   powershell -ExecutionPolicy Bypass -File install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]
 #
-# Steps (in order): packages, dotfiles, wsl. Every step can be re-run safely.
+# Steps (in order): packages, dotfiles, wsl, tasks. Every step can be re-run safely.
 # Runs in Windows PowerShell 5.1. Keep it ASCII: 5.1 reads a script without a
 # BOM in the ANSI code page.
 [CmdletBinding()]
@@ -17,7 +19,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $RepoUrl = 'https://github.com/gkuga/dotfiles.git'
-$AllSteps = @('packages', 'dotfiles', 'wsl')
+$AllSteps = @('packages', 'dotfiles', 'wsl', 'tasks')
 
 if ($Help) {
   Write-Host @'
@@ -29,7 +31,7 @@ Usage: install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]
   -Only    run only the given steps
   -Help    show this help
 
-Steps (in order): packages, dotfiles, wsl
+Steps (in order): packages, dotfiles, wsl, tasks
 '@
   return
 }
@@ -55,7 +57,7 @@ if (-not $here -or -not (Test-Path -LiteralPath (Join-Path $here 'scripts\window
         throw 'winget not found: install or update "App Installer" from the Microsoft Store'
       }
       Write-Host 'installing Git with winget, to clone the repository'
-      winget install --id Git.Git --exact --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
+      winget install --id Git.Git --exact --source winget --scope user --accept-package-agreements --accept-source-agreements --disable-interactivity
       # -1978335189 / -1978335135: no applicable upgrade / already installed
       # (Git is there, but not on this session's PATH yet).
       if (@(0, -1978335189, -1978335135) -notcontains $LASTEXITCODE) {

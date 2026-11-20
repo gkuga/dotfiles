@@ -29,7 +29,8 @@ if ($missing.Count -eq 0) {
   Update-Path
   if ($failed.Count -gt 0) {
     Write-Warn "not installed: $($failed -join ', ')"
-    Write-Warn '(an installer that needs an administrator shows a UAC prompt: run install.ps1 at the PC or over Remote Desktop, not over SSH)'
+    Write-Warn '(a package without a user-scope installer needs one install by hand at the PC,'
+    Write-Warn ' for example: winget install --id ID --exact, which asks for an administrator)'
   }
 }
 

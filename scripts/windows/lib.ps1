@@ -69,9 +69,10 @@ $WingetAlreadyInstalled = @(-1978335189, -1978335135)
 # "Installed, but a restart is needed to finish."
 $WingetRebootRequired = -1978334967
 
-# Installs one winget package by ID (printed only in a dry run).
+# Installs one winget package by ID for the current user, which needs no
+# administrator (printed only in a dry run).
 function Install-WingetPackage([string]$Id) {
-  $arguments = @('install', '--id', $Id, '--source', 'winget', '--accept-package-agreements') + $WingetCommon
+  $arguments = @('install', '--id', $Id, '--source', 'winget', '--scope', 'user', '--accept-package-agreements') + $WingetCommon
   if (Test-DryRun) {
     Write-Host "[dry-run] winget $($arguments -join ' ')" -ForegroundColor DarkGray
     return
