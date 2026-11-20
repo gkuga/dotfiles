@@ -32,9 +32,24 @@ foreach ($file in @(Get-ChildItem -LiteralPath (Join-Path $env:REPO_DIR 'schedul
   [void]$info.AppendChild($node)
   $settings = $doc.DocumentElement['Settings']
   $enabled = -not ($settings -and $settings['Enabled'] -and $settings['Enabled'].InnerText -eq 'false')
-  $want[$file.BaseName] = @{ Source = $node.InnerText; Xml = $doc.OuterXml; Enabled = $enabled }
+  $want[$file.BaseName] = @{
+    Source = $node.InnerText; Xml = $doc.OuterXml; Enabled = $enabled
+    NeedsWsl = $text -match 'wsl\.exe'
+  }
 }
-$have = @(Get-ScheduledTask -TaskPath $taskPath -ErrorAction SilentlyContinue)
+# A missing folder means no tasks yet; any other error (access denied, ...)
+# must not look like that, or every task would be registered again.
+try {
+  $have = @(Get-ScheduledTask -TaskPath $taskPath -ErrorAction Stop)
+} catch {
+  if ($_.CategoryInfo.Category -ne 'ObjectNotFound') { throw }
+  $have = @()
+}
+
+# A task that starts WSL waits until the Debian distro exists: before that,
+# it would fail at every logon, or start the Windows 11 stub that offers to
+# install WSL.
+$hasDebian = (Get-WslDistro) -contains 'Debian'
 
 # Register-ScheduledTask creates the folder too. A standard user may not be
 # allowed to create folders under the Task Scheduler root on some PCs.
@@ -51,6 +66,14 @@ function Register-DotfilesTask([string]$Name, [string]$Xml) {
 $changed = $false
 foreach ($name in @($want.Keys | Sort-Object)) {
   $task = $have | Where-Object { $_.TaskName -eq $name }
+  if ($task -and -not ("$($task.Source)".StartsWith($sourcePrefix))) {
+    Write-Warn "left alone: $taskPath$name was not registered by install.ps1 (it has no dotfiles Source)"
+    continue
+  }
+  if ($want[$name].NeedsWsl -and -not $hasDebian) {
+    Write-Warn "skipped $taskPath$name until the Debian distro is installed (run install.ps1 again then)"
+    continue
+  }
   $current = $task -and $task.Source -eq $want[$name].Source -and
     (($task.State -ne 'Disabled') -eq $want[$name].Enabled)
   if ($current) { continue }
@@ -74,8 +97,12 @@ foreach ($task in $have) {
   if (Test-DryRun) {
     Write-Host "[dry-run] remove scheduled task $taskPath$($task.TaskName) (no XML for it)" -ForegroundColor DarkGray
   } elseif (Confirm-Action "remove scheduled task $taskPath$($task.TaskName) (no XML for it)?") {
-    Unregister-ScheduledTask -TaskName $task.TaskName -TaskPath $taskPath -Confirm:$false
-    Write-Log "removed: $taskPath$($task.TaskName)"
+    try {
+      Unregister-ScheduledTask -TaskName $task.TaskName -TaskPath $taskPath -Confirm:$false
+      Write-Log "removed: $taskPath$($task.TaskName)"
+    } catch {
+      Write-Warn "could not remove $taskPath$($task.TaskName): $($_.Exception.Message)"
+    }
   } else {
     Write-Warn "kept $taskPath$($task.TaskName)"
   }

@@ -28,9 +28,10 @@ if ($missing.Count -eq 0) {
   }
   Update-Path
   if ($failed.Count -gt 0) {
-    Write-Warn "not installed: $($failed -join ', ')"
-    Write-Warn '(a package without a user-scope installer needs one install by hand at the PC,'
-    Write-Warn " for example: winget install --id $($failed[0]) --exact, which asks for an administrator)"
+    Write-Warn "not installed: $($failed -join ', ') (see the winget output above)"
+    Write-Warn 'If winget found no applicable installer, the package has no per-user installer:'
+    Write-Warn 'install it once at the PC, which asks for an administrator:'
+    foreach ($id in $failed) { Write-Warn "  winget install --id $id --exact --source winget" }
   }
 }
 

@@ -12,9 +12,10 @@ Debian inside WSL is set up afterwards with [setup-wsl.md](setup-wsl.md).
 
 At the PC or over Remote Desktop, until SSH into WSL works:
 
-1. In PowerShell (not as administrator), run the one-liner from step 1. It
-   installs the apps, writes `.wslconfig`, and offers to install WSL: answer
-   `y` and approve the one UAC prompt. Restart Windows.
+1. In PowerShell (not as administrator: `install.ps1` refuses to run
+   elevated), run the one-liner from step 1. It installs the apps, writes
+   `.wslconfig`, and offers to install WSL: answer `y` and approve the one UAC
+   prompt. Restart Windows. The logon task waits for Debian.
 2. Run `install.ps1` again (see "From an existing checkout" below). It
    installs Debian and registers the logon task.
 3. `wsl -d Debian`: create the Linux user, then do step 2 of
@@ -66,7 +67,8 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 | apply these dotfile changes? | `y` after reading the diff |
 | install WSL now? | `y` on a new PC, then approve the UAC prompt and restart Windows |
 | install the Debian distro? | `y` on a new PC |
-| register scheduled task ...? | `y` |
+| register / update scheduled task ...? | `y` |
+| remove scheduled task ... (no XML for it)? | `y`, unless you still want it |
 
 ## 2. What chezmoi manages on Windows
 
@@ -113,7 +115,9 @@ share the Task Scheduler tree). The step is idempotent: it registers a task
 that is missing, whose XML changed (a hash of the XML is kept in the task's
 Source field) or that was disabled by hand, leaves the others alone, and
 removes a task it registered whose XML file is gone; a task added to the
-folder by hand is left alone. Other changes made in Task Scheduler (a trigger,
+folder by hand is left alone, even under the same name. A task that starts
+WSL (its XML mentions `wsl.exe`) is registered only once the Debian distro
+exists. Other changes made in Task Scheduler (a trigger,
 an action) are not detected: change the XML instead. To add a task, create it
 in Task Scheduler, export it, replace the user ID with `__USER_SID__`, and put
 the file there.

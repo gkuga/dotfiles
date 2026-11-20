@@ -61,6 +61,31 @@ function Update-Path {
   $env:Path = $have -join ';'
 }
 
+$Wsl = Join-Path $env:SystemRoot 'System32\wsl.exe'
+
+# True when WSL itself is installed. Looks for the WSL package instead of
+# running wsl.exe: without WSL, wsl.exe is missing (Windows 10) or a stub that
+# waits for a key and then installs WSL (Windows 11). `wsl --status` would
+# also fail while WSL has no distro yet, right after
+# `wsl --install --no-distribution`.
+function Test-Wsl {
+  return (Test-Path -LiteralPath $Wsl) -and
+    [bool](Get-AppxPackage -Name 'MicrosoftCorporationII.WindowsSubsystemForLinux' -ErrorAction SilentlyContinue)
+}
+
+# The names of the installed WSL distros (empty without WSL).
+function Get-WslDistro {
+  if (-not (Test-Wsl)) { return @() }
+  # wsl.exe prints UTF-16 unless told otherwise.
+  $saved = $env:WSL_UTF8
+  $env:WSL_UTF8 = '1'
+  try {
+    return @(& $Wsl --list --quiet | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+  } finally {
+    $env:WSL_UTF8 = $saved
+  }
+}
+
 $WingetCommon = @('--exact', '--accept-source-agreements', '--disable-interactivity')
 # winget exit codes that mean the package is there already: "no applicable
 # upgrade" and "already installed". They come up for apps that `winget list`
