@@ -10,19 +10,20 @@ the new WSL distro.
 
 ## 1. Windows: create the distro
 
-In PowerShell:
-
-```powershell
-wsl --install -d Debian
-```
-
-Create the Linux user when the distro first starts.
+Set up the Windows side first with [setup-windows.md](setup-windows.md):
+`install.ps1` installs the Debian distro and writes `%USERPROFILE%\.wslconfig`
+(mirrored networking, no idle shutdown), which remote access over SSH needs
+from the start. Then run `wsl -d Debian` and create the Linux user.
 
 Mirrored networking lets WSL share the Windows IP address, so other machines
-on the LAN reach WSL directly and mDNS works. The `platform` step of
-`install.sh` (step 5) sets it, but remote access over SSH needs it from the
-start, so on a new PC add it by hand first: put this in
-`%USERPROFILE%\.wslconfig`, then run `wsl --shutdown` and start the distro again:
+on the LAN reach WSL directly and mDNS works. `instanceIdleTimeout=-1` keeps
+the distro running when no Windows terminal has it open, so SSH into WSL does
+not stop working after a while. The `platform` step of `install.sh` (step 5)
+warns when either is missing.
+
+Without `install.ps1`, run `wsl --install -d Debian` in PowerShell and put this
+in `%USERPROFILE%\.wslconfig` by hand, then run `wsl --shutdown` and start the
+distro again:
 
 ```ini
 [wsl2]
@@ -31,11 +32,6 @@ networkingMode=mirrored
 [general]
 instanceIdleTimeout=-1
 ```
-
-`instanceIdleTimeout=-1` keeps the distro running when no Windows terminal has
-it open, so SSH into WSL does not stop working after a while. The `platform`
-step also sets `defaultVhdSize=128GB` when no value is set. It leaves `memory`
-alone: set a limit that fits the PC's RAM yourself, if you want one.
 
 > [!WARNING]
 > `wsl --shutdown`, `wsl --unregister` and `reboot` inside WSL stop the distro,
@@ -135,10 +131,10 @@ cd ~/dev/src/github.com/gkuga/dotfiles && ./install.sh
 | Sign git commits with GPG | Enter (`true`) |
 | GPG signing key ID | `<keyid>` |
 | apply these dotfile changes? | `y` after reading the diff |
-| write /etc/wsl.conf? / write .../.wslconfig? | `y`; both take effect after `wsl --shutdown`, which you run only at the console |
+| write /etc/wsl.conf? | `y`; it takes effect after `wsl --shutdown`, which you run only at the console |
 
 Unattended over SSH (needs the passwordless sudo from step 2): write the answers
-first, then skip the `platform` step, which edits `/etc/wsl.conf` and `.wslconfig`:
+first, then skip the `platform` step, which edits `/etc/wsl.conf`:
 
 ```sh
 mkdir -p ~/.config/chezmoi
@@ -183,10 +179,10 @@ GitHub's ED25519 host key fingerprint is
 - `claude`: log in to Claude Code.
 - Docker: enable this distro under Docker Desktop's Settings > Resources > WSL
   integration on Windows. Docker is not installed inside WSL.
-- `/etc/wsl.conf` (`[user] default=`, `[interop] appendWindowsPath=true`) and
-  `.wslconfig` (`networkingMode`, `instanceIdleTimeout`, and `defaultVhdSize`
-  when missing; merged into the existing file, line endings kept):
-  `./install.sh --only platform` at the console, then `wsl --shutdown`.
+- `/etc/wsl.conf` (`[user] default=`, `[interop] appendWindowsPath=true`;
+  merged into the existing file): `./install.sh --only platform` at the
+  console, then `wsl --shutdown`. The same step checks `.wslconfig`, which
+  `install.ps1` manages on Windows.
 
 ## Windows from WSL
 

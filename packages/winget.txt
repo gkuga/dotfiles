@@ -1,0 +1,13 @@
+# winget packages for the Windows side (install.ps1, step packages).
+# One package ID per line; `winget search NAME` finds IDs.
+#
+# Only apps chosen for this setup. Software that the PC's administrator
+# installs and manages is left out, and so is Docker Desktop: it is installed
+# by hand from docker.com because it updates itself (as on macOS).
+Git.Git
+twpayne.chezmoi
+Microsoft.WindowsTerminal
+Microsoft.VisualStudioCode
+Google.Chrome
+Anthropic.Claude
+Anthropic.ClaudeCode

@@ -1,0 +1,23 @@
+# WSL settings for every distro on this PC. Managed by chezmoi from
+# gkuga/dotfiles (home/dot_wslconfig.tmpl): edits here or in the WSL Settings
+# app are undone by the next `chezmoi apply`, so change the template instead.
+# Changes take effect after `wsl --shutdown`.
+
+[wsl2]
+# WSL shares the Windows IP address, so other machines reach it directly and
+# mDNS works.
+networkingMode=mirrored
+# Disk size limit for distros created from now on.
+defaultVhdSize=128GB
+{{- if .wslMemory }}
+{{-   if not (regexMatch "(?i)^[0-9]+(MB|GB)$" .wslMemory) }}
+{{-     fail (printf "wslMemory in chezmoi.toml must be a number with MB or GB, such as 12GB, not %q" .wslMemory) }}
+{{-   end }}
+# Per-machine value, asked on `chezmoi init` (wslMemory).
+memory={{ .wslMemory }}
+{{- end }}
+
+[general]
+# Keep the distro running when no session is open, so SSH into WSL keeps
+# working.
+instanceIdleTimeout=-1

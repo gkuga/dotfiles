@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Platform-specific system setup that does not fit into a package list.
 #   darwin: Docker Desktop is installed by hand (it updates itself); warn if missing
-#   wsl:    /etc/wsl.conf (systemd, default user) and the Windows-side
-#           %USERPROFILE%\.wslconfig (mirrored networking, no idle shutdown,
-#           ...); Docker comes from Docker Desktop
+#   wsl:    /etc/wsl.conf (systemd, default user); checks the Windows-side
+#           %USERPROFILE%\.wslconfig, which install.ps1 manages on Windows;
+#           Docker comes from Docker Desktop
 #   linux:  Docker Engine from the official Docker apt repository
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -61,8 +61,6 @@ install_file() {
 }
 
 # Reads an INI file on stdin and prints it with KEY=VALUE set in [SECTION].
-#   - With a 4th argument "if-missing", nothing changes when KEY is already set
-#     in any [SECTION] of the file (a section may appear more than once).
 #   - Section and key names match case-insensitively, as WSL reads them, and a
 #     comment after a section header is ignored.
 #   - A line that already has the wanted value is kept as it is (key spelling,
@@ -73,7 +71,7 @@ install_file() {
 #     the comments after it, which usually introduce the next section. A missing
 #     section is appended. Everything else is kept.
 ini_set() {
-  awk -v sec="$1" -v key="$2" -v val="$3" -v mode="${4:-}" '
+  awk -v sec="$1" -v key="$2" -v val="$3" '
     function isheader(l) { return l ~ /^[[:space:]]*\[/ }
     function header(l) { sub(/\].*/, "]", l); gsub(/[[:space:]]/, "", l); return tolower(l) }
     function keyof(l) {
@@ -89,13 +87,13 @@ ini_set() {
     { line[NR] = $0 }
     END {
       want = "[" tolower(sec) "]"; lkey = tolower(key)
-      # Is KEY set in any [SECTION]? Then it is updated where it is, not added.
+      # Is KEY set in any [SECTION] (it may appear more than once)? Then it is
+      # updated where it is, not added.
       s = 0
       for (r = 1; r <= NR; r++) {
         if (isheader(line[r])) s = (header(line[r]) == want)
         else if (s && keyof(line[r]) == lkey) found = 1
       }
-      if (found && mode == "if-missing") { for (r = 1; r <= NR; r++) print line[r]; exit }
       for (r = 1; r <= NR; r++) {
         l = line[r]
         if (isheader(l)) { close_section(); insec = (header(l) == want); print l; continue }
@@ -139,7 +137,7 @@ windows_profile() {
 }
 
 platform_wsl() {
-  local conf profile
+  local conf profile want
   # An unreadable file gives empty input here; install_file then leaves it.
   conf="$(read_text /etc/wsl.conf || true)"
   conf="$(printf '%s' "$conf" | ini_set boot systemd true)"
@@ -147,25 +145,21 @@ platform_wsl() {
   conf="$(printf '%s' "$conf" | ini_set interop appendWindowsPath true)"
   install_file /etc/wsl.conf "$conf" root
 
-  # .wslconfig (Windows side, all distros):
-  #   networkingMode=mirrored   WSL shares the Windows IP address, so other
-  #                             machines reach it directly and mDNS works
-  #   instanceIdleTimeout=-1    keep the distro running when no session is
-  #                             open, so SSH into WSL keeps working
-  #   defaultVhdSize=128GB      disk limit for distros created later; only
-  #                             when not set, so a machine can choose another
-  # memory is not managed: the right limit depends on the PC's RAM.
+  # .wslconfig (Windows side, all distros) is managed by chezmoi on Windows
+  # (install.ps1, home/dot_wslconfig.tmpl). Only check the settings that SSH
+  # into WSL depends on, so that two places never write the same file.
   if ! profile="$(windows_profile)" || [ ! -d "$profile" ]; then
-    warn "Windows user profile not found: in %USERPROFILE%\\.wslconfig, set by hand"
-    warn "  [wsl2] networkingMode=mirrored and [general] instanceIdleTimeout=-1"
+    warn "Windows user profile not found; cannot check %USERPROFILE%\\.wslconfig"
   else
-    conf="$(read_text "$profile/.wslconfig" || true)"
-    conf="$(printf '%s' "$conf" | ini_set wsl2 networkingMode mirrored)"
-    conf="$(printf '%s' "$conf" | ini_set wsl2 defaultVhdSize 128GB if-missing)"
-    conf="$(printf '%s' "$conf" | ini_set general instanceIdleTimeout -1)"
-    install_file "$profile/.wslconfig" "$conf"
+    if ! conf="$(read_text "$profile/.wslconfig")"; then
+      warn "cannot read $profile/.wslconfig; not checked"
+    elif want="$(printf '%s' "$conf" | ini_set wsl2 networkingMode mirrored | ini_set general instanceIdleTimeout -1)" &&
+      [ "$want" != "$conf" ]; then
+      warn "$profile/.wslconfig lacks [wsl2] networkingMode=mirrored or [general] instanceIdleTimeout=-1"
+      warn "  run install.ps1 on Windows (docs/setup-windows.md), then 'wsl --shutdown'"
+    fi
   fi
-  log "changes to /etc/wsl.conf or .wslconfig apply after 'wsl --shutdown' in Windows"
+  log "changes to /etc/wsl.conf apply after 'wsl --shutdown' in Windows"
   log "(not while you depend on SSH into WSL: nothing starts WSL again by itself)"
 
   if ! has docker; then
