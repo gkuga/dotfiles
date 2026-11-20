@@ -156,9 +156,6 @@ the file there.
 
 ## 5. Once, by hand
 
-- Windows Terminal: Settings > Startup > Default profile: Debian, so that a
-  new terminal opens WSL. (Not managed: after a distro is created again, the
-  old profile stays in the list under the same name.)
 - Claude Code (Windows build) and Claude: log in.
 
 ## Updating
