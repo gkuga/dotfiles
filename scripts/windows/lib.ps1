@@ -49,17 +49,36 @@ function Read-List([string]$Path) {
     Where-Object { $_ }
 }
 
-# Picks up PATH entries that installers added in this session.
+# Picks up PATH entries that installers added to the user or machine PATH,
+# keeping the entries this session already has.
 function Update-Path {
-  $env:Path = @(
-    [Environment]::GetEnvironmentVariable('Path', 'Machine'),
-    [Environment]::GetEnvironmentVariable('Path', 'User')
-  ) -join ';'
+  $have = @($env:Path -split ';' | Where-Object { $_ })
+  foreach ($scope in 'Machine', 'User') {
+    foreach ($dir in @([Environment]::GetEnvironmentVariable('Path', $scope) -split ';' | Where-Object { $_ })) {
+      if ($have -notcontains $dir) { $have += $dir }
+    }
+  }
+  $env:Path = $have -join ';'
 }
 
 $WingetCommon = @('--exact', '--accept-source-agreements', '--disable-interactivity')
+# winget exit codes that mean the package is there already: "no applicable
+# upgrade" and "already installed". They come up for apps that `winget list`
+# cannot match to their winget ID.
+$WingetAlreadyInstalled = @(-1978335189, -1978335135)
 
 # Installs one winget package by ID (printed only in a dry run).
 function Install-WingetPackage([string]$Id) {
-  Invoke-Native winget (@('install', '--id', $Id, '--source', 'winget', '--accept-package-agreements') + $WingetCommon)
+  $arguments = @('install', '--id', $Id, '--source', 'winget', '--accept-package-agreements') + $WingetCommon
+  if (Test-DryRun) {
+    Write-Host "[dry-run] winget $($arguments -join ' ')" -ForegroundColor DarkGray
+    return
+  }
+  if (-not (Test-Command winget)) {
+    throw 'winget not found: install or update "App Installer" from the Microsoft Store'
+  }
+  & winget @arguments
+  if ($LASTEXITCODE -ne 0 -and $WingetAlreadyInstalled -notcontains $LASTEXITCODE) {
+    throw "winget install $Id failed (exit code $LASTEXITCODE)"
+  }
 }

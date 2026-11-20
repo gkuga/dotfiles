@@ -40,7 +40,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 
 | Prompt | Answer |
 |---|---|
-| WSL memory limit such as 12GB | a limit that fits the PC's RAM, or Enter for the WSL default (half of the RAM) |
+| WSL memory limit with GB or MB such as 12GB | a limit that fits the PC's RAM, or Enter for the WSL default (half of the RAM) |
 | install with winget: ...? | `y` |
 | apply these dotfile changes? | `y` after reading the diff |
 | install the Debian distro? | `y` on a new PC |
@@ -54,7 +54,10 @@ The same `home/` as on the other machines, but Windows only gets what
   networking, no idle shutdown, `defaultVhdSize=128GB`, and `memory` when one
   was given on `chezmoi init`. The whole file is managed: a change made in the
   file or in the WSL Settings app is undone by the next `chezmoi apply`, so
-  change the template instead. It takes effect after `wsl --shutdown`.
+  change the template instead. Settings that are only in an existing file
+  (`processors`, `swap`, ...) are dropped: the diff shows them before
+  `apply`, so move what you want to keep into the template first. It takes
+  effect after `wsl --shutdown`.
 - `%USERPROFILE%\.config\agents\AGENTS.md` and `%USERPROFILE%\.claude\CLAUDE.md`:
   the rules for coding agents, the same as on the Mac and WSL.
 - `%USERPROFILE%\.claude\settings.json`, only when it does not exist yet.

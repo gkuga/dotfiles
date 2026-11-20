@@ -28,7 +28,7 @@ if (Test-DryRun) {
     $cz = @('--source', $env:REPO_DIR, '--config', (Join-Path $tmp 'chezmoi.toml'),
       '--persistent-state', (Join-Path $tmp 'state.boltdb'))
     Invoke-Chezmoi ($cz + 'init')
-    & chezmoi @cz diff --no-pager
+    Invoke-Chezmoi ($cz + @('diff', '--no-pager'))
   } finally {
     Remove-Item -LiteralPath $tmp -Recurse -Force
   }
@@ -42,7 +42,10 @@ $changes = (& chezmoi @cz diff --no-pager) -join "`n"
 if ($LASTEXITCODE -ne 0) { throw 'chezmoi diff failed' }
 if ($changes) {
   Write-Host $changes
-  if (-not (Confirm-Action 'apply these dotfile changes?')) { throw 'aborted; nothing was applied' }
+  if (-not (Confirm-Action 'apply these dotfile changes?')) {
+    Write-Warn 'skipped the dotfiles; nothing was applied'
+    return
+  }
 }
 Invoke-Chezmoi ($cz + 'apply')
 if ($changes -match '\.wslconfig') {

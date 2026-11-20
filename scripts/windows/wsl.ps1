@@ -8,7 +8,9 @@ $wsl = Join-Path $env:SystemRoot 'System32\wsl.exe'
 $savedUtf8 = $env:WSL_UTF8
 $env:WSL_UTF8 = '1'
 try {
-  & $wsl --status | Out-Null
+  # Not `wsl --status`: that fails while WSL has no distro yet, which is the
+  # state right after `wsl --install --no-distribution`.
+  & $wsl --version | Out-Null
   if ($LASTEXITCODE -ne 0) {
     Write-Warn 'WSL is not installed. In an administrator PowerShell, run:'
     Write-Warn '  wsl --install --no-distribution'
@@ -21,7 +23,7 @@ try {
     Write-Log 'the Debian distro is installed'
   } elseif (Confirm-Action 'install the Debian distro (wsl --install -d Debian)?') {
     Invoke-Native $wsl @('--install', '--distribution', 'Debian', '--no-launch')
-    Write-Log "start it with 'wsl -d Debian' and create the Linux user"
+    if (-not (Test-DryRun)) { Write-Log "start it with 'wsl -d Debian' and create the Linux user" }
   } else {
     Write-Warn 'skipped the Debian distro'
   }

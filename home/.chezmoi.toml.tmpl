@@ -3,7 +3,7 @@
 {{- /* No "=" or "," in prompts: `chezmoi init --promptString PROMPT=VALUE` could not set them. */ -}}
 {{- if eq .chezmoi.os "windows" -}}
 {{- /* Windows only gets the files listed in .chezmoiignore: no git or GPG. */ -}}
-{{-   $wslMemory := promptStringOnce . "wslMemory" "WSL memory limit such as 12GB (leave empty for the WSL default)" "" -}}
+{{-   $wslMemory := promptStringOnce . "wslMemory" "WSL memory limit with GB or MB such as 12GB (leave empty for the WSL default)" "" -}}
 # The repository root (it holds .chezmoiroot), so that plain `chezmoi diff`
 # and `chezmoi apply` work without --source.
 sourceDir = {{ .chezmoi.workingTree | quote }}

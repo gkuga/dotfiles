@@ -151,9 +151,10 @@ platform_wsl() {
   if ! profile="$(windows_profile)" || [ ! -d "$profile" ]; then
     warn "Windows user profile not found; cannot check %USERPROFILE%\\.wslconfig"
   else
-    conf="$(read_text "$profile/.wslconfig" || true)"
-    want="$(printf '%s' "$conf" | ini_set wsl2 networkingMode mirrored | ini_set general instanceIdleTimeout -1)"
-    if [ "$want" != "$conf" ]; then
+    if ! conf="$(read_text "$profile/.wslconfig")"; then
+      warn "cannot read $profile/.wslconfig; not checked"
+    elif want="$(printf '%s' "$conf" | ini_set wsl2 networkingMode mirrored | ini_set general instanceIdleTimeout -1)" &&
+      [ "$want" != "$conf" ]; then
       warn "$profile/.wslconfig lacks [wsl2] networkingMode=mirrored or [general] instanceIdleTimeout=-1"
       warn "  run install.ps1 on Windows (docs/setup-windows.md), then 'wsl --shutdown'"
     fi
