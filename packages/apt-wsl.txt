@@ -9,3 +9,7 @@ wslu
 # networkingMode=mirrored, where WSL ships Hyper-V firewall rules for mDNS.
 avahi-daemon
 libnss-mdns
+
+# SSH into WSL. Installed by hand before install.sh (docs/setup-wsl.md, step 2),
+# since SSH needs it first; listed so that the setup says what it relies on.
+openssh-server

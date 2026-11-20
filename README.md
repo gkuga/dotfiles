@@ -19,6 +19,9 @@ Environment: bash 5, tmux (screen kept for serial consoles), Neovim
 # Fresh machine
 curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/main/install.sh | bash
 
+# Windows (the first step on a new PC, in PowerShell; see docs/setup-windows.md)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/gkuga/dotfiles/main/install.ps1)))
+
 # From a checkout
 ./install.sh --dry-run          # print what would change, change nothing
 ./install.sh                    # all steps

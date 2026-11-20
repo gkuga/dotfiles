@@ -1,7 +1,7 @@
 # Bootstraps the Windows side of the development environment: winget
 # packages, dotfiles (chezmoi: .wslconfig and the coding-agent rules), WSL and
 # scheduled tasks. Nothing here needs an administrator, so it also runs over
-# SSH; only installing WSL itself does, and that command is printed instead.
+# SSH; only installing WSL itself does, once, after you agree at the prompt.
 #
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/gkuga/dotfiles/main/install.ps1)))
 #   powershell -ExecutionPolicy Bypass -File install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]

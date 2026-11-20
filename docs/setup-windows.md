@@ -8,13 +8,29 @@ Debian inside WSL is set up afterwards with [setup-wsl.md](setup-wsl.md).
 
 `install.ps1` runs in the Windows PowerShell 5.1 that comes with Windows.
 
+## A new PC, in order
+
+At the PC or over Remote Desktop, until SSH into WSL works:
+
+1. In PowerShell (not as administrator), run the one-liner from step 1. It
+   installs the apps, writes `.wslconfig`, and offers to install WSL: answer
+   `y` and approve the one UAC prompt. Restart Windows.
+2. Run `install.ps1` again (see "From an existing checkout" below). It
+   installs Debian and registers the logon task.
+3. `wsl -d Debian`: create the Linux user, then do step 2 of
+   [setup-wsl.md](setup-wsl.md) (`openssh-server`, mDNS, `authorized_keys`).
+4. Stay logged on to Windows. From now on, everything else can run over SSH:
+   the rest of [setup-wsl.md](setup-wsl.md), and `install.ps1` again through
+   `powershell.exe` when this repository changes.
+
 ## 1. Run install.ps1
 
-Nothing in `install.ps1` needs an administrator, so it never shows a UAC
-prompt and also runs over SSH (through WSL, with `powershell.exe`). The only
-exceptions are done once, by hand, at the PC or over Remote Desktop: installing
-WSL itself (step 3), and an app whose winget package has no per-user installer
-(`Google.Chrome`) on a PC where it is not installed yet.
+Nothing in `install.ps1` needs an administrator except installing WSL
+itself, which it does only after you answer `y` (one UAC prompt, on a new PC;
+with `-Yes` it prints the command instead). So later runs never show a UAC
+prompt and also work over SSH (through WSL, with `powershell.exe`). An app
+whose winget package has no per-user installer (`Google.Chrome`) is the other
+exception: on a PC where it is not installed yet, install it once by hand.
 
 On a new PC, in PowerShell:
 
@@ -40,7 +56,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 |---|---|
 | `packages` | `winget install --scope user` for each ID in `packages/winget.txt` that is missing; warns if Docker Desktop is missing |
 | `dotfiles` | installs chezmoi, shows the diff, applies it after confirmation |
-| `wsl` | checks that WSL is installed; installs the Debian distro after confirmation |
+| `wsl` | installs WSL (one UAC prompt) and the Debian distro, each after confirmation |
 | `tasks` | makes the Task Scheduler folder `\dotfiles\<user SID>\` match `scheduled-tasks/*.xml` |
 
 | Prompt | Answer |
@@ -48,6 +64,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 | WSL memory limit with GB or MB such as 12GB | a limit that fits the PC's RAM, or Enter for the WSL default (half of the RAM) |
 | install with winget: ...? | `y` |
 | apply these dotfile changes? | `y` after reading the diff |
+| install WSL now? | `y` on a new PC, then approve the UAC prompt and restart Windows |
 | install the Debian distro? | `y` on a new PC |
 | register scheduled task ...? | `y` |
 
@@ -79,9 +96,11 @@ The answer to the memory prompt is stored in
 
 ## 3. WSL
 
-If WSL itself is missing, the `wsl` step prints the command for an
-administrator PowerShell (`wsl --install --no-distribution`); restart Windows
-and run `install.ps1` again. The Debian distro is installed without starting
+If WSL itself is missing, the `wsl` step offers to run
+`wsl --install --no-distribution` as administrator (one UAC prompt). With
+`-Yes`, in a dry run, or when the UAC prompt is declined, it prints that
+command for an administrator PowerShell instead. Restart Windows afterwards and
+run `install.ps1` again. The Debian distro is installed without starting
 it: run `wsl -d Debian` once to create the Linux user, then continue with
 [setup-wsl.md](setup-wsl.md).
 
