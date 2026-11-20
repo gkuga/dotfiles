@@ -89,6 +89,36 @@ function Get-WslDistro {
   }
 }
 
+# Runs a PowerShell command as administrator, after asking: one UAC prompt on
+# this screen. Never with -Yes or in a dry run, where nobody may see the
+# prompt; returns $false then, or when it was declined or failed, so that the
+# caller can print the command to run by hand.
+function Invoke-Elevated([string]$Question, [string]$Command) {
+  if ((Test-DryRun) -or $env:ASSUME_YES -eq '1') { return $false }
+  if (-not (Confirm-Action "$Question (asks for an administrator once, on this screen)")) { return $false }
+  # The elevated window closes when the command ends, so its error is written
+  # to a file and shown here.
+  $log = Join-Path ([IO.Path]::GetTempPath()) ('dotfiles-elevated-' + [guid]::NewGuid() + '.log')
+  $wrapped = "`$ErrorActionPreference = 'Stop'; try { $Command } catch { (`$_ | Out-String) | Set-Content -LiteralPath '$log'; exit 1 }"
+  # -EncodedCommand: Start-Process joins -ArgumentList without quoting.
+  $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($wrapped))
+  try {
+    $p = Start-Process -FilePath powershell.exe -Verb RunAs -Wait -PassThru `
+      -ArgumentList '-NoProfile', '-EncodedCommand', $encoded
+  } catch {
+    # Also when the UAC prompt is declined.
+    Write-Warn "did not run as administrator: $($_.Exception.Message)"
+    return $false
+  }
+  $failed = $p.ExitCode -ne 0
+  if ($failed) { Write-Warn "the administrator command failed (exit code $($p.ExitCode))" }
+  if (Test-Path -LiteralPath $log) {
+    Get-Content -LiteralPath $log | ForEach-Object { Write-Warn "  $_" }
+    Remove-Item -LiteralPath $log -Force -ErrorAction SilentlyContinue
+  }
+  return -not $failed
+}
+
 $WingetCommon = @('--exact', '--accept-source-agreements', '--disable-interactivity')
 # winget exit codes that mean the package is there already: "no applicable
 # upgrade" and "already installed". They come up for apps that `winget list`

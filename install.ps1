@@ -1,7 +1,8 @@
 # Bootstraps the Windows side of the development environment: winget
 # packages, dotfiles (chezmoi: .wslconfig and the coding-agent rules), WSL and
 # scheduled tasks. Nothing here needs an administrator, so it also runs over
-# SSH; only installing WSL itself does, once, after you agree at the prompt.
+# SSH; only installing WSL itself and the Hyper-V firewall rule for SSH into
+# WSL do, once each, after you agree at the prompt.
 #
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/gkuga/dotfiles/main/install.ps1)))
 #   powershell -ExecutionPolicy Bypass -File install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]
@@ -39,7 +40,7 @@ Steps (in order): packages, dotfiles, wsl, debian, tasks
 # Every step works for the user who runs it: winget installs per user, and
 # chezmoi and the scheduled tasks use that user's profile. Elevated, that can
 # be another account (an administrator's credentials on a standard account),
-# and it is not needed: installing WSL asks for elevation by itself. Where
+# and it is not needed: the wsl step asks for elevation by itself. Where
 # every shell is elevated (UAC off, the built-in Administrator), go on after
 # confirmation.
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()

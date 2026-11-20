@@ -62,7 +62,14 @@ start the distro again, and check `ps -p 1 -o comm=` prints `systemd`.
 `avahi-daemon` and `libnss-mdns` make `<windows-hostname>.local` resolvable on
 the LAN (they are also in `packages/apt-wsl.txt`). WSL's DNS tunneling does not
 pass on the mDNS answers that Windows gets, so Linux has to speak mDNS itself.
-WSL ships the Hyper-V firewall rules that allow it.
+WSL ships the Hyper-V firewall rules that allow it. SSH is not allowed by
+default: in mirrored mode the Hyper-V firewall drops other incoming traffic to
+WSL, so TCP 22 needs an inbound rule. `install.ps1` (step `wsl`) adds it after
+asking (one UAC prompt); by hand, in an administrator PowerShell:
+
+```powershell
+New-NetFirewallHyperVRule -Name 'WSL2-Mirrored-SSH' -DisplayName 'WSL2 Mirrored SSH' -Direction Inbound -VMCreatorId '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -Protocol TCP -LocalPorts 22 -Action Allow
+```
 
 Optional, to let the setup run unattended over SSH:
 
