@@ -6,7 +6,7 @@
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/gkuga/dotfiles/main/install.ps1)))
 #   powershell -ExecutionPolicy Bypass -File install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]
 #
-# Steps (in order): packages, dotfiles, wsl, tasks. Every step can be re-run safely.
+# Steps (in order): packages, dotfiles, wsl, debian, tasks. Every step can be re-run safely.
 # Runs in Windows PowerShell 5.1. Keep it ASCII: 5.1 reads a script without a
 # BOM in the ANSI code page.
 [CmdletBinding()]
@@ -19,7 +19,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $RepoUrl = 'https://github.com/gkuga/dotfiles.git'
-$AllSteps = @('packages', 'dotfiles', 'wsl', 'tasks')
+$AllSteps = @('packages', 'dotfiles', 'wsl', 'debian', 'tasks')
 
 if ($Help) {
   Write-Host @'
@@ -31,7 +31,7 @@ Usage: install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]
   -Only    run only the given steps
   -Help    show this help
 
-Steps (in order): packages, dotfiles, wsl, tasks
+Steps (in order): packages, dotfiles, wsl, debian, tasks
 '@
   return
 }

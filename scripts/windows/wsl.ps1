@@ -38,8 +38,6 @@ if ((Get-WslDistro) -contains 'Debian') {
   } finally {
     $env:WSL_UTF8 = $saved
   }
-  if (-not (Test-DryRun)) { Write-Log "start it with 'wsl -d Debian' and create the Linux user" }
 } else {
   Write-Warn 'skipped the Debian distro'
 }
-Write-Log 'next: set up Debian itself with install.sh (docs/setup-wsl.md)'
