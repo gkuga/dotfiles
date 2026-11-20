@@ -115,16 +115,18 @@ If WSL itself is missing, the `wsl` step offers to run
 `-Yes`, in a dry run, or when the UAC prompt is declined, it prints that
 command for an administrator PowerShell instead. Restart Windows afterwards and
 run `install.ps1` again. The Debian distro is installed without starting
-it: run `wsl -d Debian` once to create the Linux user, then continue with
-[setup-wsl.md](setup-wsl.md).
+it, and the `debian` step creates the Linux user: do not start it with
+`wsl -d Debian` before that, or its own prompt creates a user first.
 
 The `debian` step runs the scripts `scripts/windows/debian-root.sh` (as
 root) and `debian-user.sh` (as the Linux user) inside Debian. Every part is
-skipped when it is done; `install.sh` runs only while
-`~/.config/chezmoi/chezmoi.toml` does not exist in Debian, so later runs leave
-an installed Debian alone (update it with `install.sh` inside Debian). With
-`-Yes`, the distro is not restarted, because that may cut the SSH session
-the run comes through.
+skipped when it is done; `install.sh` runs until it has once gone through
+(`debian-user.sh` then leaves `~/.local/state/dotfiles/installed-by-install.ps1`
+in Debian), so later runs leave an installed Debian alone (update it with
+`install.sh` inside Debian). The distro is restarted, after confirmation,
+while `/etc/wsl.conf` changed or systemd is not running; with `-Yes` it is
+not, because that may cut the SSH session the run comes through. If the step
+fails, it says why, and the `tasks` step still runs.
 
 ## 4. Scheduled tasks
 

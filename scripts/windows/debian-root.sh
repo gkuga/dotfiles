@@ -5,10 +5,15 @@
 # packages/apt-wsl.txt) and for install.sh, the Linux user with a password for
 # sudo, /etc/wsl.conf ([boot] systemd, [user] default), and authorized_keys
 # from https://github.com/GITHUB_USER.keys. Every part is skipped when it is
-# done already. Exits with 3 when /etc/wsl.conf changed: that takes effect
-# after the distro restarts.
+# done already. Exits with 120 when the distro needs a restart: /etc/wsl.conf
+# changed, or systemd is not running yet. (120: no command here returns it,
+# so a failure is never taken for that.)
 set -eu
 user="$1"
+case "$user" in
+  [a-z_]*) ;;
+  *) echo "not a valid Linux user name: $user" >&2; exit 1 ;;
+esac
 github="$2"
 restart=0
 
@@ -54,6 +59,8 @@ if ! grep -q '^[[:space:]]*\[user\]' "$conf"; then
   restart=1
 fi
 [ "$restart" = 0 ] || log "updated $conf"
+# Also when an earlier restart was skipped: sshd and avahi run under systemd.
+[ -d /run/systemd/system ] || restart=1
 
 if [ -n "$github" ]; then
   home="$(getent passwd "$user" | cut -d: -f6)"
@@ -61,6 +68,8 @@ if [ -n "$github" ]; then
   file="$home/.ssh/authorized_keys"
   install -d -m 700 -o "$user" -g "$group" "$home/.ssh"
   [ -e "$file" ] || install -m 600 -o "$user" -g "$group" /dev/null "$file"
+  # A last line without a newline would swallow the first added key.
+  if [ -s "$file" ] && [ -n "$(tail -c 1 "$file")" ]; then echo >>"$file"; fi
   if keys="$(curl -fsSL "https://github.com/$github.keys")"; then
     before="$(wc -l <"$file")"
     printf '%s\n' "$keys" | while IFS= read -r key; do
@@ -73,4 +82,4 @@ if [ -n "$github" ]; then
   fi
 fi
 
-[ "$restart" = 0 ] || exit 3
+[ "$restart" = 0 ] || exit 120
