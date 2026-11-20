@@ -19,6 +19,9 @@ Environment: bash 5, tmux (screen kept for serial consoles), Neovim
 # Fresh machine
 curl -fsSL https://raw.githubusercontent.com/gkuga/dotfiles/main/install.sh | bash
 
+# Windows (the first step on a new PC, in PowerShell; see docs/setup-windows.md)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/gkuga/dotfiles/main/install.ps1)))
+
 # From a checkout
 ./install.sh --dry-run          # print what would change, change nothing
 ./install.sh                    # all steps
@@ -44,9 +47,11 @@ Steps run in this order; each one is idempotent:
 | `shell` | Homebrew bash as login shell | already bash 5 | already bash 5 |
 
 On Windows, `install.ps1` takes the same options (`-DryRun`, `-Yes`, `-Only`)
-and runs `packages` (winget: `packages/winget.txt`), `dotfiles` (chezmoi, with
-only `.wslconfig` and the coding-agent rules) and `wsl` (checks WSL, installs
-Debian). See [docs/setup-windows.md](docs/setup-windows.md).
+and runs `packages` (winget, per user: `packages/winget.txt`), `dotfiles`
+(chezmoi, with only `.wslconfig` and the coding-agent rules), `wsl` (checks
+WSL, installs Debian) and `tasks` (Task Scheduler tasks from
+[scheduled-tasks/](scheduled-tasks/), such as starting WSL at logon), without
+administrator rights. See [docs/setup-windows.md](docs/setup-windows.md).
 
 On the first `chezmoi init` you are asked for git name/email and GPG signing
 settings (on Windows, only for a WSL memory limit). Answers are stored in

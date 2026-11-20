@@ -61,6 +61,34 @@ function Update-Path {
   $env:Path = $have -join ';'
 }
 
+$Wsl = Join-Path $env:SystemRoot 'System32\wsl.exe'
+
+# True when WSL itself is installed. Looks for the WSL package instead of
+# running wsl.exe: without WSL, wsl.exe is missing (Windows 10) or a stub that
+# waits for a key and then installs WSL (Windows 11). `wsl --status` would
+# also fail while WSL has no distro yet, right after
+# `wsl --install --no-distribution`.
+# WSL comes as a Store package (`wsl --install`) or as an MSI from its GitHub
+# releases, which installs into Program Files\WSL.
+function Test-Wsl {
+  if (-not (Test-Path -LiteralPath $Wsl)) { return $false }
+  if (Test-Path -LiteralPath (Join-Path $env:ProgramFiles 'WSL\wsl.exe')) { return $true }
+  return [bool](Get-AppxPackage -Name 'MicrosoftCorporationII.WindowsSubsystemForLinux' -ErrorAction SilentlyContinue)
+}
+
+# The names of the installed WSL distros (empty without WSL).
+function Get-WslDistro {
+  if (-not (Test-Wsl)) { return @() }
+  # wsl.exe prints UTF-16 unless told otherwise.
+  $saved = $env:WSL_UTF8
+  $env:WSL_UTF8 = '1'
+  try {
+    return @(& $Wsl --list --quiet | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+  } finally {
+    $env:WSL_UTF8 = $saved
+  }
+}
+
 $WingetCommon = @('--exact', '--accept-source-agreements', '--disable-interactivity')
 # winget exit codes that mean the package is there already: "no applicable
 # upgrade" and "already installed". They come up for apps that `winget list`
@@ -69,9 +97,10 @@ $WingetAlreadyInstalled = @(-1978335189, -1978335135)
 # "Installed, but a restart is needed to finish."
 $WingetRebootRequired = -1978334967
 
-# Installs one winget package by ID (printed only in a dry run).
+# Installs one winget package by ID for the current user, which needs no
+# administrator (printed only in a dry run).
 function Install-WingetPackage([string]$Id) {
-  $arguments = @('install', '--id', $Id, '--source', 'winget', '--accept-package-agreements') + $WingetCommon
+  $arguments = @('install', '--id', $Id, '--source', 'winget', '--scope', 'user', '--accept-package-agreements') + $WingetCommon
   if (Test-DryRun) {
     Write-Host "[dry-run] winget $($arguments -join ' ')" -ForegroundColor DarkGray
     return

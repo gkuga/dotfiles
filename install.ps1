@@ -1,10 +1,12 @@
 # Bootstraps the Windows side of the development environment: winget
-# packages, dotfiles (chezmoi: .wslconfig and the coding-agent rules) and WSL.
+# packages, dotfiles (chezmoi: .wslconfig and the coding-agent rules), WSL and
+# scheduled tasks. Nothing here needs an administrator, so it also runs over
+# SSH; only installing WSL itself does, once, after you agree at the prompt.
 #
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/gkuga/dotfiles/main/install.ps1)))
 #   powershell -ExecutionPolicy Bypass -File install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]
 #
-# Steps (in order): packages, dotfiles, wsl. Every step can be re-run safely.
+# Steps (in order): packages, dotfiles, wsl, tasks. Every step can be re-run safely.
 # Runs in Windows PowerShell 5.1. Keep it ASCII: 5.1 reads a script without a
 # BOM in the ANSI code page.
 [CmdletBinding()]
@@ -17,7 +19,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $RepoUrl = 'https://github.com/gkuga/dotfiles.git'
-$AllSteps = @('packages', 'dotfiles', 'wsl')
+$AllSteps = @('packages', 'dotfiles', 'wsl', 'tasks')
 
 if ($Help) {
   Write-Host @'
@@ -29,9 +31,24 @@ Usage: install.ps1 [-DryRun] [-Yes] [-Only STEP[,STEP...]]
   -Only    run only the given steps
   -Help    show this help
 
-Steps (in order): packages, dotfiles, wsl
+Steps (in order): packages, dotfiles, wsl, tasks
 '@
   return
+}
+
+# Every step works for the user who runs it: winget installs per user, and
+# chezmoi and the scheduled tasks use that user's profile. Elevated, that can
+# be another account (an administrator's credentials on a standard account),
+# and it is not needed: installing WSL asks for elevation by itself. Where
+# every shell is elevated (UAC off, the built-in Administrator), go on after
+# confirmation.
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+if ((New-Object Security.Principal.WindowsPrincipal $identity).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+  Write-Host "warning: running as administrator ($($identity.Name)). Every step installs for this account;"
+  Write-Host 'run install.ps1 from a normal PowerShell unless this is the account you use.'
+  if (-not $Yes -and -not $DryRun -and (Read-Host 'continue as administrator? [y/N]') -notmatch '^(y|yes)$') {
+    return
+  }
 }
 
 # Started from irm there is no checkout yet: clone it, then run its copy.
@@ -55,7 +72,7 @@ if (-not $here -or -not (Test-Path -LiteralPath (Join-Path $here 'scripts\window
         throw 'winget not found: install or update "App Installer" from the Microsoft Store'
       }
       Write-Host 'installing Git with winget, to clone the repository'
-      winget install --id Git.Git --exact --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
+      winget install --id Git.Git --exact --source winget --scope user --accept-package-agreements --accept-source-agreements --disable-interactivity
       # -1978335189 / -1978335135: no applicable upgrade / already installed
       # (Git is there, but not on this session's PATH yet).
       if (@(0, -1978335189, -1978335135) -notcontains $LASTEXITCODE) {
