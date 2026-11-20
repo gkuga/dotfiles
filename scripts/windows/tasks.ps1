@@ -84,7 +84,7 @@ foreach ($name in @($want.Keys | Sort-Object)) {
   $verb = if ($task) { 'update' } else { 'register' }
   if (Test-DryRun) {
     Write-Host "[dry-run] $verb scheduled task $taskPath$name" -ForegroundColor DarkGray
-  } elseif (-not (Confirm-Action "$verb scheduled task $taskPath$name?")) {
+  } elseif (-not (Confirm-Action "$verb scheduled task $taskPath${name}?")) {
     Write-Warn "skipped $taskPath$name"
   } elseif (Register-DotfilesTask $name $want[$name].Xml) {
     Write-Log "$verb`: $taskPath$name"

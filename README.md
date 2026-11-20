@@ -48,8 +48,9 @@ Steps run in this order; each one is idempotent:
 
 On Windows, `install.ps1` takes the same options (`-DryRun`, `-Yes`, `-Only`)
 and runs `packages` (winget, per user: `packages/winget.txt`), `dotfiles`
-(chezmoi, with only `.wslconfig` and the coding-agent rules), `wsl` (checks
-WSL, installs Debian) and `tasks` (Task Scheduler tasks from
+(chezmoi, with only `.wslconfig` and the coding-agent rules), `wsl` (installs
+WSL and Debian), `debian` (the Linux user, SSH and mDNS, then `install.sh`
+inside Debian) and `tasks` (Task Scheduler tasks from
 [scheduled-tasks/](scheduled-tasks/), such as starting WSL at logon), without
 administrator rights. See [docs/setup-windows.md](docs/setup-windows.md).
 

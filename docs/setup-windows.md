@@ -18,12 +18,15 @@ At the PC or over Remote Desktop, until SSH into WSL works:
    prompt. Restart Windows. The logon task is not registered yet: it waits
    for Debian.
 2. Run `install.ps1` again (see "From an existing checkout" below). It
-   installs Debian and registers the logon task.
-3. `wsl -d Debian`: create the Linux user, then do step 2 of
-   [setup-wsl.md](setup-wsl.md) (`openssh-server`, mDNS, `authorized_keys`).
-4. Stay logged on to Windows. From now on, everything else can run over SSH:
-   the rest of [setup-wsl.md](setup-wsl.md), and `install.ps1` again through
-   `powershell.exe` when this repository changes.
+   installs Debian, then sets it up (step `debian`): the Linux user and its
+   password, `openssh-server` and mDNS, `authorized_keys` from
+   `github.com/gkuga.keys`, a restart of the distro, and `install.sh` inside
+   it, where you answer the chezmoi prompts. Last, it registers the logon
+   task.
+3. Stay logged on to Windows. From now on, the rest can run over SSH: copy
+   the keys and machine settings (step 4 of [setup-wsl.md](setup-wsl.md)),
+   and run `install.ps1` again through `powershell.exe` when this repository
+   changes.
 
 ## 1. Run install.ps1
 
@@ -62,6 +65,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 | `packages` | `winget install --scope user` for each ID in `packages/winget.txt` that is missing; warns if Docker Desktop is missing |
 | `dotfiles` | installs chezmoi, shows the diff, applies it after confirmation |
 | `wsl` | installs WSL (one UAC prompt) and the Debian distro, each after confirmation |
+| `debian` | in Debian: packages for SSH and mDNS, the Linux user, `/etc/wsl.conf`, `authorized_keys` from GitHub; then `install.sh` inside it, until chezmoi is set up there |
 | `tasks` | makes the Task Scheduler folder `\dotfiles-<user SID>\` match `scheduled-tasks/*.xml` |
 
 | Prompt | Answer |
@@ -71,6 +75,10 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 | apply these dotfile changes? | `y` after reading the diff |
 | install WSL now? | `y` on a new PC, then approve the UAC prompt and restart Windows |
 | install the Debian distro? | `y` on a new PC |
+| Linux user name for Debian | Enter for `gkuga` |
+| New password (in Debian) | the password for `sudo` |
+| restart Debian now to apply /etc/wsl.conf? | `y` at the PC (it stops SSH sessions into WSL) |
+| run install.sh in Debian as ...? | `y`; then answer as in step 5 of [setup-wsl.md](setup-wsl.md) |
 | register / update scheduled task ...? | `y` |
 | remove scheduled task ... (no XML for it)? | `y`, unless you still want it |
 
@@ -109,6 +117,14 @@ command for an administrator PowerShell instead. Restart Windows afterwards and
 run `install.ps1` again. The Debian distro is installed without starting
 it: run `wsl -d Debian` once to create the Linux user, then continue with
 [setup-wsl.md](setup-wsl.md).
+
+The `debian` step runs the scripts `scripts/windows/debian-root.sh` (as
+root) and `debian-user.sh` (as the Linux user) inside Debian. Every part is
+skipped when it is done; `install.sh` runs only while
+`~/.config/chezmoi/chezmoi.toml` does not exist in Debian, so later runs leave
+an installed Debian alone (update it with `install.sh` inside Debian). With
+`-Yes`, the distro is not restarted, because that may cut the SSH session
+the run comes through.
 
 ## 4. Scheduled tasks
 

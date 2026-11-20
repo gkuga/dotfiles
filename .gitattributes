@@ -1,0 +1,4 @@
+# LF everywhere, also in a checkout made by Git for Windows (core.autocrlf):
+# the shell scripts run in Debian from the Windows checkout (install.ps1, step
+# debian), and the chezmoi templates render the same on every machine.
+* text=auto eol=lf

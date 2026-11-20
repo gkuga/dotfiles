@@ -13,7 +13,9 @@ the new WSL distro.
 Set up the Windows side first with [setup-windows.md](setup-windows.md):
 `install.ps1` installs the Debian distro and writes `%USERPROFILE%\.wslconfig`
 (mirrored networking, no idle shutdown), which remote access over SSH needs
-from the start. Then run `wsl -d Debian` and create the Linux user.
+from the start. Its `debian` step also does steps 2, 3 and 5 below (the user,
+SSH and mDNS, `install.sh`), so after it only step 4 is left. The steps here
+are for doing it by hand.
 
 Mirrored networking lets WSL share the Windows IP address, so other machines
 on the LAN reach WSL directly and mDNS works. `instanceIdleTimeout=-1` keeps
