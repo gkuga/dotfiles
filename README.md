@@ -11,7 +11,8 @@ Linux hosts (Debian-based), and the Windows side of a PC that runs WSL.
 | Glue | bash (3.2 compatible); Windows PowerShell 5.1 on Windows | [install.sh](install.sh), [scripts/](scripts/); [install.ps1](install.ps1), [scripts/windows/](scripts/windows/) |
 
 Environment: bash 5, tmux (screen kept for serial consoles), Neovim
-(Vim with a minimal config as a fallback), Docker Desktop on macOS/WSL.
+(Vim with a minimal config as a fallback), Docker Desktop on macOS, Docker
+Engine on WSL and Linux.
 
 ## Usage
 
@@ -43,7 +44,7 @@ Steps run in this order; each one is idempotent:
 | `packages` | Xcode CLT, Homebrew, `brew bundle` | apt: `apt-common.txt` + `apt-wsl.txt` | apt: `apt-common.txt` + `apt-linux.txt` |
 | `dotfiles` | install chezmoi, show the diff, apply after confirmation | same | same |
 | `mise` | install mise, `mise install` | same | same |
-| `platform` | warn if Docker Desktop is missing | `/etc/wsl.conf` (systemd, default user); check `%USERPROFILE%\.wslconfig` | Docker Engine |
+| `platform` | warn if Docker Desktop is missing | `/etc/wsl.conf` (systemd, default user); check `%USERPROFILE%\.wslconfig`; Docker Engine | Docker Engine |
 | `shell` | Homebrew bash as login shell | already bash 5 | already bash 5 |
 
 On Windows, `install.ps1` takes the same options (`-DryRun`, `-Yes`, `-Only`)

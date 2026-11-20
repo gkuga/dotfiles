@@ -65,7 +65,7 @@ the policy with Group Policy, it wins, and the scripts may not run at all.
 
 | Step | What it does |
 |---|---|
-| `packages` | `winget install --scope user` for each ID in `packages/winget.txt` that is missing; warns if Docker Desktop is missing |
+| `packages` | `winget install --scope user` for each ID in `packages/winget.txt` that is missing |
 | `dotfiles` | installs chezmoi, shows the diff, applies it after confirmation |
 | `wsl` | installs WSL (one UAC prompt), adds the Hyper-V firewall rule for SSH into WSL (one UAC prompt), and installs the Debian distro, each after confirmation |
 | `debian` | in Debian: packages for SSH and mDNS, the Linux user, `/etc/wsl.conf`, `authorized_keys` from GitHub; then `install.sh` inside it, until chezmoi is set up there |
@@ -156,9 +156,6 @@ the file there.
 
 ## 5. Once, by hand
 
-- Docker Desktop: install it from docker.com (it updates itself, so it is not
-  in `winget.txt`), then enable the Debian distro under Settings > Resources >
-  WSL integration.
 - Windows Terminal: Settings > Startup > Default profile: Debian, so that a
   new terminal opens WSL. (Not managed: after a distro is created again, the
   old profile stays in the list under the same name.)

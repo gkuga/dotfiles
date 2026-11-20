@@ -186,8 +186,14 @@ GitHub's ED25519 host key fingerprint is
 
 - `nvim`: plugins install on the first start; then `:Copilot auth`.
 - `claude`: log in to Claude Code.
-- Docker: enable this distro under Docker Desktop's Settings > Resources > WSL
-  integration on Windows. Docker is not installed inside WSL.
+- Docker: the `platform` step installs Docker Engine inside the distro
+  (from download.docker.com, started by systemd), after asking, once systemd
+  runs. To use `docker` without `sudo`, log in again: a new SSH login, or
+  `wsl --terminate Debian` in Windows (a new terminal tab may reuse the old
+  session). Docker Desktop is not used:
+  it needs an administrator to install and a paid subscription in larger
+  organizations. Where its WSL integration is on, the step leaves Docker
+  alone.
 - `/etc/wsl.conf` (`[user] default=`, `[interop] appendWindowsPath=true`;
   merged into the existing file): `./install.sh --only platform` at the
   console, then `wsl --shutdown`. The same step checks `.wslconfig`, which

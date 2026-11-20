@@ -34,9 +34,3 @@ if ($missing.Count -eq 0) {
     foreach ($id in $failed) { Write-Warn "  winget install --id $id --exact --source winget" }
   }
 }
-
-# Docker Desktop updates itself, so it is installed by hand (as on macOS).
-if (-not (Test-Path -LiteralPath (Join-Path $env:ProgramFiles 'Docker\Docker\Docker Desktop.exe'))) {
-  Write-Warn 'Docker Desktop not found: install it from https://www.docker.com/products/docker-desktop/'
-  Write-Warn '(not in winget.txt: it updates itself)'
-}

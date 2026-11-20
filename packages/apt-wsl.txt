@@ -1,4 +1,4 @@
-# WSL only. Docker comes from Docker Desktop's WSL integration.
+# WSL only. Docker Engine is installed by scripts/platform.sh (as on Linux hosts).
 
 # wslview (open URLs/files with Windows apps); skipped if not in the repositories
 wslu
